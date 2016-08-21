@@ -1,0 +1,17 @@
+# ENEE670
+Objective Systems Overview:
+-	tracking system to track skydivers during a jump 
+-	situational awareness of skydivers for aircrafts, other divers, and ground station
+-	track time in air, altitude, velocity of decent using sensors 
+-	uses ABD-S to alert other planes in area of divers’ locations
+-	10 mi radius of ground station
+-	will be activated right before take off from ground 
+-	uses transmitters attached to jumper to send signals of info tracking down to ground station customized receiver 
+-	display at ground station of jumpers’ tracking information and stores in database
+-	transmitter has unique coding for each person, similar to air traffic control coding for planes in area
+-	ground station will send handshake to jumpers’ transmitter 
+-	transmitters attached to jumper will also send same signals of info tracking to aircraft in vicinity (need requirement)
+      - will also send info to surrounding jumpers for proximity awareness 
+      - if too close, audible notification will engage 
+- 
+
