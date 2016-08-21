@@ -1,0 +1,48 @@
+# ENEE670
+KPPs 
+-     The ground CI shall be able to track up to and including 600 jumpers
+      simultaneously  
+-     The airborne CI shall be able to operate between 1,001 and 35,000 feet AGL (Expanding on it).
+-     The system shall update each known target's position at no less than 4 Hz. (update with X,Y,Z accuracy requirement) 
+-     The system shall be capable of target recognition and reporting status for a 50 mile radius surrounding the location of the ground       station.
+-     The system shall be able to operate at a maximum altitude of 128,000 feet (39014 meters)
+-     The system shall record each jump excursion 
+-     The system shall store data from each jump with a jump ID 
+-     The system shall record incidents that occur during jump excursion concurrently with an incident ID 
+-     The system shall be able to operate with a minimum availability of 0.995 during jumps 
+-     The system shall be water resistant of up to 500m deep.
+-     The system shall be able to withstand harsh windy conditions of up to 80m/hr
+-     Outdoor components of the system shall be capable of operating in environmental conditions of: 
+	Temperature, −50 °C to +70 °C 
+	Relative humidity, 2% to 100% 
+-     The system shall be able to support open software architecture 
+-     The system shall be able to load jump missioning planning data 
+-     The system shall be able to support external storage devices 
+-     The system shall be able to calculate take off data 
+-     The system shall be able to calculate landing data
+ # Risk/Opportunity Management plan
+-     Access the risks involved with the KPPs
+-     Identify the levels of risk for each KPP 
+-     Identify opportunities that may arise as a result
+-     Identify consequences
+-     risk/opportunity table
+-     determine certainties and uncertainties in the KPPs to simulate
+-     Determine a mitigation plan
+
+
+
+Objective Systems Overview:
+-	tracking system to track skydivers during a jump 
+-	situational awareness of skydivers for aircrafts, other divers, and ground station
+-	track time in air, altitude, velocity of decent using sensors 
+-	uses ABD-S to alert other planes in area of divers’ locations
+-	10 mi radius of ground station
+-	will be activated right before take off from ground 
+-	uses transmitters attached to jumper to send signals of info tracking down to ground station customized receiver 
+-	display at ground station of jumpers’ tracking information and stores in database
+-	transmitter has unique coding for each person, similar to air traffic control coding for planes in area
+-	ground station will send handshake to jumpers’ transmitter 
+-	transmitters attached to jumper will also send same signals of info tracking to aircraft in vicinity (need requirement)
+      - will also send info to surrounding jumpers for proximity awareness 
+      - if too close, audible notification will engage 
+-   Stating the KPPs and requirements that we need
