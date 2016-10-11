@@ -1,0 +1,3 @@
+time,lat,lon,hMSL,velN,velE,velD,hAcc,vAcc,sAcc,gpsFix,numSV
+,(deg),(deg),(m),(m/s),(m/s),(m/s),(m),(m),(m/s),,,
+2016-05-29T00:05:15.00Z,39.7069334,-75.0358827,44.967,-0.15,0.01,-0.29,33.348,38.108,2.31,3,8
