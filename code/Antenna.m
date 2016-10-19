@@ -46,3 +46,5 @@ histogram (Pr, nbins)
 
 %Noise power 
 %%N = -228.6 + 10* log 10(
+
+fprintf('Francis fucked your shit up');
