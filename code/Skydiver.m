@@ -11,6 +11,9 @@ classdef Skydiver
         cvN  = 0;
         cvE  = 0;
         cvD  = 0;
+        cheading = 0;
+        pSpace = nan;
+        
     end
     
     methods
