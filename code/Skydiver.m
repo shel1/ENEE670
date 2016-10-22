@@ -22,8 +22,12 @@ classdef Skydiver
     end
     
     methods
-        function [obj] = Skydiver(obj, varargin)
+        function [obj] = Skydiver()
+            % no need to keep the UIDs the same for now, just an identifier
             obj.uid = char(java.util.UUID.randomUUID);
+            % initialize with some canned data for testing
+            
+
         end
         function [obj] = proximityCheck(obj)
         %%
@@ -40,16 +44,16 @@ classdef Skydiver
             % sample points
             phi1    =  39.707145;
             lambda1 = -75.036073;
+            alt1    = 100; %meters
             phi2    =  39.706640;
             lambda2 = -75.033629;
+            alt2    = 300;
             
             % convert degrees to radians
             phi1    = phi1*(pi/180);
             lambda1 = lambda1*(pi/180);
-            alt1    = 100; %meters
             phi2    = phi2*(pi/180);
             lambda2 = lambda2*(pi/180);
-            alt2    = 300;
             
             deltaPhi = phi2-phi1;
             deltaLambda = lambda2-lambda1;
