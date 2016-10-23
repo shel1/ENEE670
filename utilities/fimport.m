@@ -81,6 +81,15 @@ function [ outputData ] = fimport( folderStr )
             outputData(j).maxAlt = max(tmpTable.hMSL);
             outputData(j).meanhAcc = mean(tmpTable.hAcc);
             outputData(j).meanhScc = mean(tmpTable.sAcc);
+            %let the games begin
+            locDerivative = [];
+            [r,~] = size(tmpTable);
+            for k = 1:r-1
+                locDerivative(k) = geoDiff(tmpTable.lat(k),tmpTable.lon(k),tmpTable.hMSL(k),...
+                    tmpTable.lat(k+1),tmpTable.lon(k+1),tmpTable.hMSL(k+1));
+            end
+            
+            outputData(j).locDerivative = locDerivative;
         end
     end
 end
