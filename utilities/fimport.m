@@ -90,6 +90,8 @@ function [ outputData ] = fimport( folderStr )
             end
             
             outputData(j).locDerivative = locDerivative;
+            % don't care about XY here, just for exit finding
+            outputData(j).velDownDerivative = diff(tmpTable.velD); 
         end
     end
 end
