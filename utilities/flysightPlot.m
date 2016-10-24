@@ -14,7 +14,8 @@ function [ output_args ] = flysightPlot( varargin )
             hold all;
             grid on;
             for i = 1:c
-                q3(data(i).lat,data(i).lon,data(i).hMSL,data(i).velN,data(i).velE,data(i).velD);
+                exitIdx = getExit(data(i));
+                q3(data(i).lat(exitIdx:end),data(i).lon(exitIdx:end),data(i).hMSL(exitIdx:end),data(i).velN(exitIdx:end),data(i).velE(exitIdx:end),data(i).velD(exitIdx:end));
                 title('Position & velocity');
             end
         case 2
