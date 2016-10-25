@@ -1,2 +1,3 @@
 # ENEE670
-Should fill this at some point
+
+Run startup.m at startup in order to add the repository path to the environment.
