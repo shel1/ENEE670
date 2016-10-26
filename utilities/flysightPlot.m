@@ -10,6 +10,7 @@ function [ output_args ] = flysightPlot( varargin )
     eTHigh = 10;    
     switch p
         case 1
+            %% plot quiver3
             f=figure;
             hold all;
             grid on;
@@ -19,14 +20,17 @@ function [ output_args ] = flysightPlot( varargin )
                 title('Position & velocity');
             end
         case 2
-            f2 = figure;
+            %% plot position only
+            figure;
             hold all;
             grid on;
+            
             for i = 1:c
                 plot3(data(i).lat,data(i).lon,data(i).hMSL);
                 title('Position only');
             end
         case 3
+            %% plot location derivative
             figure;
             hold all;
             for i = 1:c
@@ -34,6 +38,7 @@ function [ output_args ] = flysightPlot( varargin )
                 title({'LLA Derivative';'\DeltaT=.002s'});
             end
         case 4
+            %% plot down velocity with exit finder
             w = 10;
             b = (1/w)*ones(1,w);
             a = 1;

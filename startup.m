@@ -2,3 +2,4 @@
 
 p = genpath('.');
 addpath(p);
+srcroot = pwd;

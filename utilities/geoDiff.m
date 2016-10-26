@@ -1,6 +1,7 @@
 function [ d ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+%GEODIFF Find the slant range distance between two points in 3-D space.
+%   This function uses the law of haversines to approximate the distance
+%   between two points relative to Earth.
 
 
             % law of haversines
