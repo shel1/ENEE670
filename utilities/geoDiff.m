@@ -42,5 +42,3 @@ function [ d ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
 
 end
 
-
-
