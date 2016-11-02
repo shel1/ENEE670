@@ -5,9 +5,9 @@ function [ output_args ] = proximitySim( in )
     % condition input data
     
     data1 = in(1);
-    data2 = in(4);
+    data2 = in(5);
     safeRadius = 150; %meters
-    Fs = 0.20;
+    Fs = 0.20; %flysight sample rate
     t = seconds(Fs);
     tClock = seconds(0);
     exitIdx1 = getExit(data1)

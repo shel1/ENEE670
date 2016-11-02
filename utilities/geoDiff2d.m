@@ -1,8 +1,8 @@
-function [ d ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
-%GEODIFF Find the slant range distance between two points in 3-D space.
+function [ d ] = geoDiff2d(lat,lon,lat2,lon2)
+%GEODIFF Find the slant range distance between two points in 2-D space.
 %   This function uses the law of haversines to approximate the distance
 %   between two points relative to Earth.
-
+%   This will be used for range calculations.
 
             % law of haversines
             % https://en.wikipedia.org/wiki/Haversine_formula
@@ -20,10 +20,9 @@ function [ d ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
             % assign inputs
             phi1    =  lat;
             lambda1 = lon;
-            alt1    = alt;
+            
             phi2    =  lat2;
             lambda2 = lon2;
-%             alt2    = alt2;           %already assigned
             
             % convert degrees to radians
             phi1    = phi1*(pi/180);
@@ -33,13 +32,9 @@ function [ d ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
             
             deltaPhi = phi2-phi1;
             deltaLambda = lambda2-lambda1;
-            deltaAlt    = alt2-alt1;
-            %compute distance
-            % ignore the curve from here forward.
-            xyDistance= 2*earthRadius*asin(sqrt(hav(deltaPhi)+cos(phi1)*cos(phi2)*hav(deltaLambda)));
-            %relative slant range/proximity
-            d = sqrt((xyDistance.^2)+(deltaAlt.^2));
 
+            %compute distance
+            d= 2*earthRadius*asin(sqrt(hav(deltaPhi)+cos(phi1)*cos(phi2)*hav(deltaLambda)));
 
 end
 
