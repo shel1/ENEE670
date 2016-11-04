@@ -3,17 +3,21 @@ function [ z ] = LinkBudget( r )
 %   Function accepts range values as input and calculate the
 %   Signal-to-Noise or Energy bit per unit noise
 
-f = 978; % frequency
-PTx = 20; %Transmit power 
+%% Units
+Hz = 1.0;
+KHz = 1.0e3;
+
+fs = 978*Hz; % frequency
+fb = 10^6; % bit rate 
+PTx = 20; % Transmit power at the Antenna in dBm
 AG_tx = 0; % Transmit Antenna gain  
 pl = 3; %Polarization loss
 z = 10*log10(0.3.^2./(4*pi()*r.^2)); % Free space loss calculation
 AG_rx = 10; % Recieve Antenna gain
 Pr = PTx + AG_tx + pl + z; % Recieved power
-Rs = -93; % Receive Antenna sensitivity
+Rs = -93; % Receive Antenna sensitivity for 90% message success rate in dBm
 Lm = Pr - Rs; % Link Margin
-EbNo = 10.^(Lm/10)
-% EbNo = Lm + 10*log10(bandwidth/rate);
+EbNo = 10*log10(Lm)
 
 end
 
