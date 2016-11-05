@@ -70,6 +70,7 @@
             
         end
     end
+    vStruct = validateCapacity(MSO(3:end,:,:)); %take out the first 2 entries
 %     figure;
 %     subplot(411);
 %     plot(MSO,'+');
