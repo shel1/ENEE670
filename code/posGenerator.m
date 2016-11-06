@@ -3,7 +3,6 @@ function [ rLat, rLon ] = posGenerator( oLat,oLon,deltaLat,deltaLon )
 %   Detailed explanation goes here
     
    
-   
    maxLat = oLat+deltaLat;
    minLat = oLat-deltaLat;
    maxLon = oLon+deltaLon;
