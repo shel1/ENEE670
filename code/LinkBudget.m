@@ -1,4 +1,4 @@
-function [ z ] = LinkBudget(lat,lon,alt,lat2,lon2,alt2 )
+function [ z ] = LinkBudget(lat,lon,alt,lat2,lon2,alt2)
 % Link Budget 
 %   Function accepts range values as input and calculate the
 %   Signal-to-Noise or Energy bit per unit noise
