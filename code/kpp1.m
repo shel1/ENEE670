@@ -63,7 +63,8 @@
     % generate first N(0) and N(1)
     ct = 0;
     trash = 0;
-    NVals = repmat(skel,N,sj);
+    skel50 = repmat(skel,N,1);
+    NVals = repmat(skel50,1,sj);
     
     rData = zeros(2,N,sj);
     vStructskel.dr=zeros(1,sj);
@@ -114,29 +115,24 @@
         for m = 0:N
             m1 = m+1;
             mtic(m1) = tic;
+
+            [latSttmp,lonSttmp, trash, ct]= posGenWrapper(lat,lon,deltaLat,deltaLon,ct,trash,radius);            
+            rData(1,m1,s)= latSttmp.val;
+            rData(2,m1,s)= lonSttmp.val;
+            newRow = [latSttmp;lonSttmp]';
+            NVals(2*m1:2*m1+1,s) = newRow;
             switch m
                 case 0 
 %                     fprintf('m = %g\n',m);
-                    [latSttmp,lonSttmp, trash, ct]= posGenWrapper(lat,lon,deltaLat,deltaLon,ct,trash,radius);
-                    rData(1,m1,s)= latSttmp.val;
-                    rData(2,m1,s)= lonSttmp.val;
 %                     plotm(latSttmp.val,lonSttmp.val,'r.');
-                    newRow = [latSttmp;lonSttmp]';
-                    NVals(1:2,s) = newRow;
                     Rzero = mod(NVals(1,1).b2d,3200);
-                    R(1) = Rzero;
-                    R(m1,s) = 752 + R(1);
-
+                    R(1,s) = Rzero;
+                    R(m1,s) = 752 + R(1,s);
                 case 1
-                    term1 = 4001*R(1);
+                    term1 = 4001*R(m1-1,s);
                     tidx = mod(m1,2)+1;
-                    [latSttmp,lonSttmp, trash, ct]= posGenWrapper(lat,lon,deltaLat,deltaLon,ct,trash,radius);
-                    rData(1,m1,s)= latSttmp.val;
-                    rData(2,m1,s)= lonSttmp.val;
 %                     plotm(latSttmp.val,lonSttmp.val,'r.');
-                    newRow = [latSttmp;lonSttmp]';
-                    NVals(3:4,s) = newRow;
-                    term2 = NVals(tidx,s).b2d;
+                    term2 = NVals(m1+tidx,s).b2d;
 %                     fprintf('m = %g\n',m);
 %                     fprintf('Term1: %g\n',term1);
 %                     fprintf('Term2: %g\n',term2);
@@ -144,14 +140,8 @@
                 otherwise
                     % anything other than m=0 or m=1
                     term1 = 4001*R(m1-1);
-                    [latSttmp,lonSttmp, trash, ct]= posGenWrapper(lat,lon,deltaLat,deltaLon,ct,trash,radius);
-                    rData(1,m1,s)= latSttmp.val;
-                    rData(2,m1,s)= lonSttmp.val;                    
-%                     plotm(latSttmp.val,lonSttmp.val,'r.');
-                    newRow = [latSttmp;lonSttmp]';
-                    NVals(m*2+1:(m*2)+2,s) = newRow;
                     tidx = mod(m,2)+1;
-                    term2 = NVals(tidx,s).b2d;
+                    term2 = NVals(m1+tidx,s).b2d;
 %                     term1 = 4001*randi([0,4095],1,1);
 %                     term2 = randi([0,4095],1,1);
 %                     fprintf('m = %g\n',m);
@@ -163,8 +153,8 @@
     %         R(0+1)=rpn(0,R,rNOne);
     %         R(1+1)=rpn(1,R,rNOne);
 %             R(m+1,s)      =   rpn(m,lastR,NOne);
-            MSO(m1,s)    =   752+R(m+1,s);
-            Ttx(m1,s)    =   (6000+ (250*MSO(m+1,s)))*1e-6;%convert to µs
+            MSO(m1,s)    =   752+R(m1,s);
+            Ttx(m1,s)    =   (6000+ (250*MSO(m1,s)))*1e-6;%convert to µs
             mtime(m1)=toc(mtic(m1));
         end
     sjtime(s)= toc(sjtic(s));
@@ -172,41 +162,22 @@
     fprintf('SJ time: %6.3f\n',sjtime(s));
 %     vStructMSO(:,:,s) = validateCapacity(MSO(2:end,:));
     end
-%%    
-       distUnit = earthRadius('nm');   
- [latc, lonc] = scircle1(lat,lon,radius,[],distUnit);
- 
-    
-    for x=1:50
-        clf;
-        sqlat= squeeze(rData(1,x,1:600));
-        sqlon= squeeze(rData(2,x,1:600));
-        axesm(pStruct);
-        
-        plotm(lat,lon,'o'); %plot the origin
-        plotm(latc,lonc,'g');
-        plotm(sqlat,sqlon,'.');
-        pause(.1);
-    end
-%     vStructTtx = validateCapacity(Ttx(2:end,:));
-
-        %%
-% figure;
-% plot(MSO,'+');
-
+% %%    
+%        distUnit = earthRadius('nm');   
+%  [latc, lonc] = scircle1(lat,lon,radius,[],distUnit);
+%  
+%     
+%     for x=1:50
+%         clf;
+%         sqlat= squeeze(rData(1,x,1:600));
+%         sqlon= squeeze(rData(2,x,1:600));
+%         axesm(pStruct);
+%         
+%         plotm(lat,lon,'o'); %plot the origin
+%         plotm(latc,lonc,'g');
+%         plotm(sqlat,sqlon,'.');
+%         pause(.1);
+%     end
+% %     vStructTtx = validateCapacity(Ttx(2:end,:));
 % 
-    
-    %     figure;
-%     subplot(411);
-%     plot(MSO,'+');
-%     subplot(412);
-%     plot(Ttx,'o');
-%     subplot(413);
-%     plot(term1,'.');
-%     subplot(414);
-%     plot(term2,'.');
-%     figure;
-%     plot(Ttx,'+');
-    
-    
-    
+%         

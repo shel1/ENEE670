@@ -1,28 +1,29 @@
-function [ exitIdx ] = getExit( data )
-%UNTITLED4 Summary of this function goes here
-%   Detailed explanation goes here
-    eT = 1.5;
-    d = data.velD;
+function [ exitIdx ] = getExit( dat )
+%GETEXIT return the exit index from input vector
+%   Best estimate based on the delta velocity signature
+
+    eT = 5;
+    h = .2;
+
     
-    ground = find(data.hMSL<1500,1); %zero out before 1000m
-    data.velD(1:ground) = 0;
+     
+    ground = find(dat.hMSL<1500,1); %zero out before 1000m
+    dat.velD(1:ground) = 0;
 %                 d2(1:ground) = 0;
     % get the derivative before zeroing out stuff
-    velDprime = diff(data.velD);
-%     d2altprime = diff(data.hMSL);
-    hA = data.hAcc;
+    velDprime = diff(dat.velD)/h;
+    %moving average
+    velDprime = SMA(velDprime,25);
+%     hA = data.hAcc;
     % zero out entries with poor accuracy
-    meanhAcc = mean(hA);
-    datahAcc = hA - meanhAcc;
-    data.velD(datahAcc>4) = 0;
-    data.hMSL(datahAcc>4) = 0;
-%                 fdata = filter(b,a,d);
+%     meanhAcc = mean(hA);
+%     datahAcc = hA - meanhAcc;
+%     data.velD(datahAcc>4) = 0;
+%     data.hMSL(datahAcc>4) = 0;
 
-    velDprime(velDprime<1) = 0; %noise threshold
-    velDprime(velDprime>4) = 0;
-    
-    
+
+%     velDprime(velDprime<1) = 0; %noise threshold
+%     velDprime(velDprime>10) = 0;
     exitIdx = find((velDprime>eT),1);                    
-
 end
 
