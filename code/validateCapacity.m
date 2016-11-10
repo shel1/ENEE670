@@ -21,6 +21,7 @@ function [ odat ] = validateCapacity( dat )
         % its a 2D array, since its only relative to that 'jumper'
         [zr, zc]=find(odat(ii).dr==0);
         odat(ii).zeroidx= [zr zc];
+        odat(ii).dupeCount = length(zr);
     end
 end
 
