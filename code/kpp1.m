@@ -15,88 +15,134 @@
     
     % no charge number, so we're ignoring the full globe, assume quadrant 1
     % for latitude and quadrant 4 for longitude, per Table 2-14 DO-282B
-    clear all;
+    
+    
+%%
     close all;
+    clear all;
     lat = 39.7054758;
     lon = -75.0330031;
-    Num(1,1) = lat;
-    Num(1,2) = 0;
-    Num(2,1) = lon;
-    Num(2,2) = 1;
-    % no need to store the char vector of binary numbers
-    
+    radius = 10; %nautical miles
+    N   =50; %number of trials
+    sj = 600; %simultaneous messages
     LSB = 360/(2.^24);
     
-    latq = lat/LSB;
-    lonq = lon/LSB;
+    m2nm = 1852; %conversion
+    
+    % determine deltaLat and deltaLon for range to origin checking
+    [deltaLat,deltaLon] = findLocDelta(lat,lon,radius);
+    %initialize empty structs for random lat and random lon results
+    rLatN0=struct();
+    rLonN1=struct();
+    %initialize the counters for validated values, and the trash can
+    goodValCollector = 0;
+    trashCollector = 0;
+    idx =0;
+    skel.val=[];
+    skel.qval=[];
+    skel.bin=[];
+    skel.b2d=[];
+    
+    latSt= skel;
+    lonSt=skel;
+
+    load('pStruct.mat');
+    % dont forget to put pStruct somewhere
+
 %%
-    m=0; % start with first frame, always;
-    R = 0; % random number stack
+   
+    R = []; % random number stack
     % so if the USA wasn't the center of the universe,we would care about
     % the rest here, and deal with the negative DD/DMS conversions 
+
+%%    
+
+    % generate skeletons to save time
+    ct = 0;
+    trash = 0;
+    skel50 = repmat(skel,N,1);
+    skel100 = repmat(skel,2*N,1);
+    NVals = repmat(skel100,1,sj);
     
-    latbinfull = dec2bin(abs(latq)); %quadrant 1
-    lonbinfull = dec2bin(abs(lonq)); %quadrant 4
+    rData = zeros(2,N*2,sj);
+    vStructskel.dr=zeros(1,sj);
+    vStructskel.zeroidx=zeros(1,sj);
+    vStructMSO = repmat(vStructskel,1,600,600);
     
-    Nzero = latbinfull(end-11:end); %12 LSBs
-    None = lonbinfull(end-11:end);  %12 LSBs
+    MSO = zeros(N,sj);
+    Ttx = zeros(N,sj);
     
-    % deal with the m=0 case
-    Rzero = mod(bin2dec(Nzero),3200); %convert back to an int, take modulus
-    
-    N   =100; %number of trials
-    sj = 600; %simultaneous messages
-    
-    % starting with integer representation of the 12 LSBs
-    % TODO: back out the lat/lon calc that leads to this
-    
-    rNOne  = [randi([0,4095],N,1) ]; %12 bytes each 2^12=4096
-    
-%     term1 = [];
-%     term2 = [];
-     
-    %shuffle the deck
-    rng('shuffle');
-    %set up the loop to make unique samples for 'simultaneous messages'
+    rStream = RandStream('mlfg6331_64');
+    RandStream.setGlobalStream(rStream);
+    rowStack = [skel100];%stacking up the lat/lon values
     for s = 1:sj
         % N number of trials for each sj
-        for m = 0:N
-            
-    %         R(0+1)=rpn(0,R,rNOne);
-    %         R(1+1)=rpn(1,R,rNOne);
-            R(m+1,s)      =   rpn(m,R,rNOne);
-            MSO(m+1,s)    =   752+R(m+1,s);
-            Ttx(m+1,s)    =   (6000+ (250*MSO(m+1,s)))*1e-6;%convert to µs
-            
-        end
-    end
-    vStruct = validateCapacity(MSO(3:end,:,:)); %take out the first 2 entries
-%     figure;
-%     subplot(411);
-%     plot(MSO,'+');
-%     subplot(412);
-%     plot(Ttx,'o');
-%     subplot(413);
-%     plot(term1,'.');
-%     subplot(414);
-%     plot(term2,'.');
-%     figure;
-%     plot(Ttx,'+');
-    
-    
-    
-    %%
-%     lat = R(n);
-%     long = R(n+1);
-%     N = [lat, long];
-%     %N(0) = latitude; 
-%     %N(1) = longitude; 
-% 
-%     %when m = 0, R(0) = N(0) mod3200
-%     %when m>=1, R(m) = {4001 R(m-1) + N(m mod 2)} mod 3200
-%     %modulated start times for transmission simulation 
-% 
-%     MSO = 752 + N; %when airborne
-%     msecs = 6000 + (250 * MSO); 
-    
 
+        sjtic(s) = tic;
+        if s == 103
+            sj;
+        end
+%         rStream.Substream = s;
+        for m = 0:N
+            m1 = m+1;
+            mtic(m1) = tic;
+
+            [latSttmp,lonSttmp, trash, ct]= posGenWrapper(lat,lon,deltaLat,deltaLon,ct,trash,radius);            
+            
+            % do all the math in advance
+            rData(1,m1,s)= latSttmp.val;
+            rData(2,m1,s)= lonSttmp.val;
+            
+            newRow = [latSttmp;lonSttmp];
+            rowStack = [newRow; rowStack(1:end-2)];
+
+            % reset the term index and zero out the math, in case of a
+            % hiccup
+            tidx = mod(m1,2)+1;
+            term1 = 0;
+            term2 = 0;
+            switch m
+                case 0 
+                    Rzero = mod(newRow(1).b2d,3200);
+                    R(1,s) = Rzero;
+                    R(m1,s) = 752 + R(1,s);
+                case 1
+                    term1 = 4001*R(m1-1,s);
+                    term2 = newRow(tidx).b2d;
+                    R(m1,s) = mod(term1+term2,3200);
+                otherwise
+                    % anything other than m=0 or m=1
+                    term1 = 4001*R(m1-1);
+                    term2 = newRow(tidx).b2d;
+                    R(m1,s) = mod(term1+term2,3200);
+            end
+                        
+            MSO(m1,s)    =   752+R(m1,s);
+            Ttx(m1,s)    =   (6000+ (250*MSO(m1,s)))*1e-6;%convert to µs
+            mtime(m1)=toc(mtic(m1));
+        end
+%         % add to map
+%         plotm(rData(1,:,s),rData(2,:,s),'r.');
+%         title('Points for single trial');
+        
+        % add the current stack of N trials to the output dataset
+        NVals = [rowStack NVals(:,(1:end-1))];
+        sjtime(s)= toc(sjtic(s));
+        fprintf('S = %g\n',s);
+        fprintf('SJ time: %6.3f\n',sjtime(s));
+
+    end
+    % generate the validation data
+    vStructMSO(:,:,s) = validateCapacity(MSO);
+    figure;
+    histogram([vStructMSO.dupeCount]);
+    hold all;
+    title({'Distrbution of duplicate MSOs';'across 600 simultaneous messages. N=50'});
+    %   axesm(pStruct);
+%   distUnit = earthRadius('nm');   
+%  [latc, lonc] = scircle1(lat,lon,radius,[],distUnit);
+%  plotm(lat,lon,'o'); %plot the origin
+%  plotm(latc,lonc,'g'); % plot the range
+%  rd1 = squeeze(rData(:,1,:))';
+%  plotm(rd1,'r.');
+         

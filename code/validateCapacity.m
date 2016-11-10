@@ -8,19 +8,20 @@ function [ odat ] = validateCapacity( dat )
     [r c] = size(dat);
     odat = struct();
     % dake difference between columns
-    for i=1:c
-        for j=1:c
-            tempdiff= diff([dat(:,i) dat(:,j)],1,2);
+    for ii=1:c
+        for jj=1:c
+            tempdiff= diff([dat(:,ii) dat(:,jj)],1,2);
             if sum(tempdiff)==0 %help identify when its doing a diff against itself
                 tempdiff(:,1)=nan; 
             end
-            dr(:,j)=tempdiff;
-            odat(i).dr(:,j) = dr(:,j);
+            dr(:,jj)=tempdiff;
+            odat(ii).dr(:,jj) = dr(:,jj);
         end
         % find and report the run and message that collided.
         % its a 2D array, since its only relative to that 'jumper'
-        [zr, zc]=find(odat(i).dr==0);
-        odat(i).zeroidx= [zr zc];
+        [zr, zc]=find(odat(ii).dr==0);
+        odat(ii).zeroidx= [zr zc];
+        odat(ii).dupeCount = length(zr);
     end
 end
 
