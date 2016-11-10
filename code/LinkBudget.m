@@ -6,7 +6,6 @@ function [ z ] = LinkBudget(lat,lon,alt,lat2,lon2,alt2)
 %% Units
 Hz = 1.0;
 KHz = 1.0e3;
-
 fs = 978*Hz; % frequency
 fb = 10^6; % bit rate 
 PTx = 20; % Transmit power at the Antenna in dBm
