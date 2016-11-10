@@ -60,27 +60,18 @@ function [ outputData ] = fimport( folderStr )
     %will be able to cat everything together after that.
     vn = fNames;%simple rename, vn came first
     outputData = struct([]); %initialize an empty  struct
-
+    h=.2; % time step size
     for j = 1:length(vn)
         [~,~,ext] = fileparts(cell2mat(vn{j}));
         if strcmp(ext,'.CSV')
             tmpTable = flysightimportTbl(cell2mat(vn{j})); %assign the table of data
-            outputData(j).name = vn{j}; % give it a name
-            outputData(j).time = datetime(tmpTable.time,'Format','uuuu-MM-dd''T''HH:mm:ss.SS''Z');
-            outputData(j).lat =  tmpTable.lat;
-            outputData(j).lon =  tmpTable.lon;
-            outputData(j).hMSL =  tmpTable.hMSL;
-            outputData(j).velN =  tmpTable.velN;
-            outputData(j).velE =  tmpTable.velE;
-            outputData(j).velD =  tmpTable.velD;
-            outputData(j).hAcc =  tmpTable.hAcc;
-            outputData(j).vAcc =  tmpTable.vAcc;
-            outputData(j).sAcc =  tmpTable.sAcc;
-            outputData(j).gpsFix =  tmpTable.gpsFix;
-            outputData(j).numSV =  tmpTable.numSV;
+            outputData(j).name = vn{j};
+            
             outputData(j).maxAlt = max(tmpTable.hMSL);
             outputData(j).meanhAcc = mean(tmpTable.hAcc);
-            outputData(j).meanhScc = mean(tmpTable.sAcc);
+            outputData(j).meanhScc = mean(tmpTable.sAcc);            
+            tmpTable.time = datetime(tmpTable.time,'Format','uuuu-MM-dd''T''HH:mm:ss.SS''Z');
+
             %let the games begin
             locDerivative = [];
             [r,~] = size(tmpTable);
@@ -88,10 +79,11 @@ function [ outputData ] = fimport( folderStr )
                 locDerivative(k) = geoDiff(tmpTable.lat(k),tmpTable.lon(k),tmpTable.hMSL(k),...
                     tmpTable.lat(k+1),tmpTable.lon(k+1),tmpTable.hMSL(k+1));
             end
-            
-            outputData(j).locDerivative = locDerivative;
+            locDerivative(r) = 0; % makes the table happy
+            tmpTable.locDerivative = locDerivative'/h;
             % don't care about XY here, just for exit finding
-            outputData(j).velDownDerivative = diff(tmpTable.velD); 
+            tmpTable.velDownDerivative = [diff(tmpTable.velD)/.2; 0]; 
+            outputData(j).jump = tmpTable;
         end
     end
 end

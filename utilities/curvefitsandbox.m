@@ -1,9 +1,10 @@
 
 %%
-load('flysightdata\LoganData.mat');
+load('LoganData.mat');
 jump = 257;
 [ T, lat, lon, hMSL, velN, velE, velD, hAcc, vAcc, sAcc ] = extractFlysightData( LoganData, jump );
 dat = [ lat, lon, hMSL, velN, velE, velD, hAcc, vAcc, sAcc ];
+h=.2;
 
 output = (diff(dat(:,4:6),1,1))/h;
 %estimated acceleration
@@ -33,7 +34,7 @@ outStack=[];
 xvals=XStart:edIdx;
 %%
 x=1;
-h=.2;
+
 i=startIdx+(x*inc);
 edIdx = i+(sz);
 edVIdx = i+szvalid;
