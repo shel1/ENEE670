@@ -7,11 +7,11 @@ function [ exitIdx ] = getExit( dat )
 
     
      
-    ground = find(dat.hMSL<1500,1); %zero out before 1000m
-    dat.velD(1:ground) = 0;
+    ground = find(dat.jump.hMSL<1500,1); %zero out before 1000m
+    dat.jump.velD(1:ground) = 0;
 %                 d2(1:ground) = 0;
     % get the derivative before zeroing out stuff
-    velDprime = diff(dat.velD)/h;
+    velDprime = diff(dat.jump.velD)/h;
     %moving average
     velDprime = SMA(velDprime,25);
 %     hA = data.hAcc;

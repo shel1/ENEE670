@@ -1,4 +1,4 @@
-function [ z ] = LinkBudget(lat,lon,alt,lat2,lon2,alt2)
+function [ z, Lm, EbNo ] = LinkBudget(lat,lon,alt,lat2,lon2,alt2)
 % Link Budget 
 %   Function accepts range values as input and calculate the
 %   Signal-to-Noise or Energy bit per unit noise
@@ -6,7 +6,8 @@ function [ z ] = LinkBudget(lat,lon,alt,lat2,lon2,alt2)
 %% Units
 Hz = 1.0;
 KHz = 1.0e3;
-fs = 978*Hz; % frequency
+MHz = 1e6;
+fs = 978*MHz; % frequency
 fb = 10^6; % bit rate 
 PTx = 20; % Transmit power at the Antenna in dBm
 AG_tx = 0; % Transmit Antenna gain  
