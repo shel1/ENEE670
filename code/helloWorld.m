@@ -1,2 +1,2 @@
-s = 'Hello World!fix003';
+s = 'Hello World!';
 disp(s);
