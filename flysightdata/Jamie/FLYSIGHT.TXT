@@ -1,3 +1,0 @@
-FlySight - http://flysight.ca/
-Processor serial number: 593330343435150b161017
-Firmware version: v20150814
