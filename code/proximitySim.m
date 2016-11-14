@@ -5,17 +5,21 @@
     % condition input data
     close all;
     clear all;
-    if ~exist('LoganData','var');
+    if ~exist('LoganData','var')
         load('LoganData.mat');
     end
     in = LoganData;
     data1 = in(44);
-    data2 = in(46);
+    data2 = in(50);
     safeRadius = 150; %meters
-    Fs = 0.20; %flysight sample rate
-    t = seconds(Fs);
+    h = 0.20; %flysight sample rate
+    t = seconds(h);
     sz = 15; % length of curve fit
     samp = 50; % length of fit sample
+    olat = 39.7054758;
+    olon = -75.0330031;
+    [m2deglat,m2deglon] = findLocDelta(olat,olon,(1/1852));
+    mcv = [m2deglat m2deglon 1];
     tClock = seconds(0);
     
     % get the exit indices from each dataset
@@ -26,6 +30,10 @@
     % snip out the struct for each dataset
     [ T1, lat1, lon1, alt1, velN1, velE1, velD1, hAcc1, vAcc1, sAcc1 ] = extractFlysightData( data1);
     [ T2, lat2, lon2, alt2, velN2, velE2, velD2, hAcc2, vAcc2, sAcc2 ] = extractFlysightData( data2);
+    
+    [vv1] = extractFlysightData( data1);
+    [vv2] = extractFlysightData( data2);
+    
     
     v1 = [lat1 lon1 alt1]; % jumper 1
     v2 = [lat2 lon2 alt2]; % jumper 2
@@ -57,6 +65,9 @@
     Lm = zeros(1,len);
     ebno = zeros(1,len);
     
+    alpha = 0.6;
+    beta = 0.02;
+    
     
     for i = 1:len
         %we're counting simulation time, different from the length of the
@@ -65,6 +76,20 @@
         
         idx1 = exitIdx1 + i;
         idx2 = exitIdx2 + i;
+        vv1t = table2array(vv1(idx1,2:7));
+        vv2t = table2array(vv2(idx2,2:7));
+        
+        
+        vv1tnew = vv1t(:,1:3) + (vv1t(:,4:6)*h.*mcv);
+        xk = vv1t(:,1:3) + (vv1t(:,4:6)*h.*mcv);
+        vk = vv1t(:,4:6);
+        rk = xk - (table2array(vv1(idx1-1,2:4))); %previous value
+        xk = xk + (alpha.*rk);
+        vk = vk + (beta.*rk)/h;
+        
+        vv2tnew = vv2t(:,1:3) + (vv2t(:,4:6)*10*h.*mcv);
+        vv1tnew = array2table(vv1tnew,'VariableNames',{'lat','lon','hMSL'});
+        vv2tnew = array2table(vv2tnew,'VariableNames',{'lat','lon','hMSL'});
         %find range difference
         gD(i) = geoDiff(lat1(idx1),lon1(idx1),alt1(idx1),lat2(idx2),lon2(idx2),alt2(idx2));
         %evaluate the link budget for the location and for that point in
@@ -105,11 +130,18 @@
         
         
        % first plot the history 
-       plot3(ax1,lat1(idx1),lon1(idx1),alt1(idx1),'ro',lat2(idx2),lon2(idx2),alt2(idx2),'b+');
+       plot3(ax1,lat1(idx1),lon1(idx1),alt1(idx1),'m-.+',lat2(idx2),lon2(idx2),alt2(idx2),'m-.+');
        % then plot the future
-       if validBuffer
-        plot3(ax1,lat1fd,lon1fd,alt1fd,'g-.',lat2fd,lon2fd,alt2fd,'m-.');
-       end
+%        if validBuffer
+%         plot3(ax1,lat1fd,lon1fd,alt1fd,'g-.',lat2fd,lon2fd,alt2fd,'m-.');
+%        end
+       % add the PV simple alpha beta calculation
+%        plot3(ax1,vv1tnew.lat,vv1tnew.lon,vv1tnew.hMSL,'b-.o');
+       plot3(ax1,xk(1),xk(2),xk(3),'k-.+');
+       plot3(ax1,vv2tnew.lat,vv2tnew.lon,vv2tnew.hMSL,'b-.o');
+       fut= geoDiff(vv1t(1),vv1t(2),vv1t(3),vv1tnew.lat,vv1tnew.lon,vv1tnew.hMSL);
+       fprintf('Diff between last point and estimate: %6.3f\n',fut);
+       
        
 %        %debug
 %        figure(100);
@@ -143,7 +175,7 @@
                fprintf('Alt: %4.3f\n',alt1(idx1));
            end
         end
-%         pause(.001);       
+        pause(.01);       
 
     end
 figure;plot(Lm);

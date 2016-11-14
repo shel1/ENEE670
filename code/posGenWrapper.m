@@ -1,6 +1,8 @@
 function [ latStruct,lonStruct, trash, ctL ] = posGenWrapper( lat,lon,deltaLat,deltaLon,varargin )
 %POSGENWRAPPER Iterates recursively until a value within bounds is returned
 %   Detailed explanation goes here
+%   Example:
+%   [latSttmp,lonSttmp, trash, ct]= posGenWrapper(lat,lon,deltaLat,deltaLon,ct,trash,radius);
     m2nm = 1852;
     LSB = 360/(2.^24);
     
