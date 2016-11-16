@@ -2,7 +2,7 @@ function [ exitIdx ] = getExit( dat )
 %GETEXIT return the exit index from input vector
 %   Best estimate based on the delta velocity signature
 
-    eT = 5;
+    eT = 1.5;
     h = .2;
 
     

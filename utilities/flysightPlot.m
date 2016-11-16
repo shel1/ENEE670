@@ -16,17 +16,18 @@ function [ output_args ] = flysightPlot( varargin )
             grid on;
             for i = 1:c
                 exitIdx = getExit(data(i));
-                q3(data(i).lat(exitIdx:end),data(i).lon(exitIdx:end),data(i).hMSL(exitIdx:end),data(i).velN(exitIdx:end),data(i).velE(exitIdx:end),data(i).velD(exitIdx:end));
+                q3(data(i).jump.lat(exitIdx:end),data(i).jump.lon(exitIdx:end),data(i).jump.hMSL(exitIdx:end),data(i).jump.velN(exitIdx:end),jump.data(i).jump.velE(exitIdx:end),data(i).jump.velD(exitIdx:end));
                 title('Position & velocity');
             end
         case 2
             %% plot position only
+            
             figure;
             hold all;
             grid on;
-            
+                        
             for i = 1:c
-                plot3(data(i).lat,data(i).lon,data(i).hMSL);
+                plot3(data(i).jump.lat,data(i).jump.lon,data(i).jump.hMSL);
                 title('Position only');
             end
         case 3
@@ -48,7 +49,7 @@ function [ output_args ] = flysightPlot( varargin )
             ax2 = subplot(212);
             hold all;
             for i = 1:c
-                d = data(i).velD;
+                d = data(i).jump.velD;
                 exitIdx = getExit(data(i));
                 plot(ax2,d(exitIdx:end),'+');
                 hold all;
@@ -61,7 +62,7 @@ function [ output_args ] = flysightPlot( varargin )
             hold all;
             grid on;
             for i = 1:c
-                velDprime = diff(data(i).velD);
+                velDprime = diff(data(i).jump.velD);
                 exitIdx = find((velDprime>eT)&(velDprime<eTHigh),1);
                 plot3(data(i).lat(exitIdx:end),data(i).lon(exitIdx:end),data(i).hMSL(exitIdx:end));
                 title('Position only');
