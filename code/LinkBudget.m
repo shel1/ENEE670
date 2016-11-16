@@ -17,7 +17,7 @@ AG_rx = 10; % Recieve Antenna gain
 Pr = PTx + AG_tx + pl + z; % Recieved power
 Rs = -93; % Receive Antenna sensitivity for 90% message success rate in dBm
 Lm = Pr - Rs; % Link Margin
-EbNo = 10*log10(Lm)
+EbNo = 10*log10(Lm);
 
 end
 
