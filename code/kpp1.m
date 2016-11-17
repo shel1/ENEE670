@@ -133,7 +133,7 @@
 
     end
     % generate the validation data
-    vStructMSO(:,:,s) = validateCapacity(MSO);
+    vStructMSO = [validateCapacity(MSO)]';
     figure;
     histogram([vStructMSO.dupeCount]);
     hold all;
