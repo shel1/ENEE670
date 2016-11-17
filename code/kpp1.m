@@ -1,5 +1,14 @@
-
-%kpp1 Capacity simulation for HawkEye
+function [out] = kpp1(varargin)
+%KPP1 Capacity simulation for HawkEye
+% [ outStruct ] = KPP1() 
+%         lat = 39.7054758;
+%         lon = -75.0330031;
+%         radius = 10; %nautical miles
+%         N   =50; %number of trials
+%         sj = 600; %simultaneous messages
+% [ outStruct ] = KPP1(N,sj)
+% [ outStruct ] = KPP1(N,sj,radius)
+% [ outStruct ] = KPP1(N,sj,radius,oLat,oLon)
 
     %m is the current UAT frame 
     %R(m-1) is a randomly generated number that will be put into N(0) and N(1)
@@ -16,17 +25,35 @@
     % no charge number, so we're ignoring the full globe, assume quadrant 1
     % for latitude and quadrant 4 for longitude, per Table 2-14 DO-282B
     
-    
 %%
     close all;
-    clear all;
-    lat = 39.7054758;
-    lon = -75.0330031;
-    radius = 10; %nautical miles
-    N   =50; %number of trials
-    sj = 600; %simultaneous messages
-    LSB = 360/(2.^24);
+    if nargin < 2
+        lat = 39.7054758;
+        lon = -75.0330031;
+        radius = 10; %nautical miles
+        N   =50; %number of trials
+        sj = 600; %simultaneous messages
+    end
     
+    switch nargin
+        case 2
+            fprintf('N and sj entered\n');
+            lat = 39.7054758;
+            lon = -75.0330031;
+            radius = 10; %nautical miles
+            %N and sj passed in
+        case 3
+            lat = 39.7054758;
+            lon = -75.0330031;
+            %N and sj and radius passed
+        case 4
+            error(why);
+        case 5
+            %everything passed in
+            fprintf('All constants entered\n');
+    end
+    
+    LSB = 360/(2.^24);
     m2nm = 1852; %conversion
     
     % determine deltaLat and deltaLon for range to origin checking
@@ -46,11 +73,9 @@
     latSt= skel;
     lonSt=skel;
 
+    % only for the Mapping Toolbox    
     load('pStruct.mat');
-    % dont forget to put pStruct somewhere
-
-%%
-   
+  
     R = []; % random number stack
     % so if the USA wasn't the center of the universe,we would care about
     % the rest here, and deal with the negative DD/DMS conversions 
@@ -60,32 +85,33 @@
     % generate skeletons to save time
     ct = 0;
     trash = 0;
-    skel50 = repmat(skel,N,1);
+    tskel.t=[];
+    tskel.trash=[];
+    tskel.ct=[];
+    plotskel.cdata=[];
+    plotskel.colormap=[];
     skel100 = repmat(skel,2*N,1);
     NVals = repmat(skel100,1,sj);
-    
     rData = zeros(2,N*2,sj);
     vStructskel.dr=zeros(1,sj);
     vStructskel.zeroidx=zeros(1,sj);
-    vStructMSO = repmat(vStructskel,1,600,600);
-    
     MSO = zeros(N,sj);
     Ttx = zeros(N,sj);
-    
+%     sjtic = zeros(N,sj);
+%     mtic = zeros(1,sj);
+    sjtime = zeros(1,sj);
+    mtime = repmat(tskel,N,sj);
+    plotstack = repmat(plotskel,1,sj);
     rStream = RandStream('mlfg6331_64');
     RandStream.setGlobalStream(rStream);
-    rowStack = [skel100];%stacking up the lat/lon values
+    rowStack = skel100;%stacking up the lat/lon values
     for s = 1:sj
         % N number of trials for each sj
 
-        sjtic(s) = tic;
-        if s == 103
-            sj;
-        end
-%         rStream.Substream = s;
+        sjtic = tic;
         for m = 0:N
             m1 = m+1;
-            mtic(m1) = tic;
+            mtic = tic;
 
             [latSttmp,lonSttmp, trash, ct]= posGenWrapper(lat,lon,deltaLat,deltaLon,ct,trash,radius);            
             
@@ -119,30 +145,46 @@
                         
             MSO(m1,s)    =   752+R(m1,s);
             Ttx(m1,s)    =   (6000+ (250*MSO(m1,s)))*1e-6;%convert to µs
-            mtime(m1)=toc(mtic(m1));
+            mtime(m1,s).t=toc(mtic);
+            mtime(m1,s).trash = trash;
+            mtime(m1,s).ct = ct;
         end
-%         % add to map
-%         plotm(rData(1,:,s),rData(2,:,s),'r.');
-%         title('Points for single trial');
         
         % add the current stack of N trials to the output dataset
         NVals = [rowStack NVals(:,(1:end-1))];
-        sjtime(s)= toc(sjtic(s));
-        fprintf('S = %g\n',s);
-        fprintf('SJ time: %6.3f\n',sjtime(s));
+        sjtime(s)= toc(sjtic);
 
     end
     % generate the validation data
+    distUnit = earthRadius('nm');   
+    [latc, lonc] = scircle1(lat,lon,radius,[],distUnit);
+    for x = 1:N
+        
+        % add to map
+        axesm(pStruct);
+        titlestr = ['Points for trial ' num2str(x)];
+        plotm(lat,lon,'o'); %plot the origin
+        plotm(latc,lonc,'g'); % plot the range
+        plotm(squeeze(rData(1,x,:)),squeeze(rData(2,x,:)),'r.');
+        title(titlestr);
+        F = getframe;
+        plotstack(x) = F;
+        clf;
+    end
+    
+
     vStructMSO = [validateCapacity(MSO)]';
+    out.rData = rData;
+    out.MSO = MSO;
+    out.Ttx = Ttx;
+    out.NVals = NVals;
+    out.mtime = mtime;
+    out.sjtime = sjtime;
+    out.vStructMSO = vStructMSO;
+    out.plotframes = plotstack;
     figure;
     histogram([vStructMSO.dupeCount]);
     hold all;
     title({'Distrbution of duplicate MSOs';'across 600 simultaneous messages. N=50'});
-    %   axesm(pStruct);
-%   distUnit = earthRadius('nm');   
-%  [latc, lonc] = scircle1(lat,lon,radius,[],distUnit);
-%  plotm(lat,lon,'o'); %plot the origin
-%  plotm(latc,lonc,'g'); % plot the range
-%  rd1 = squeeze(rData(:,1,:))';
-%  plotm(rd1,'r.');
-         
+
+end
