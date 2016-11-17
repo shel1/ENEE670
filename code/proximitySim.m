@@ -109,7 +109,7 @@
         vk2 = vv2t(:,4:6);
         xm2 = table2array(vv2(idx2-1,2:4));
         
-        [xkj2t,vkj2t,rkj2t] = alphabeta(xk2,vk2,xm2,h,numh,mcv,alpha,beta );
+        [xkj2t,vkj2t,rkj2t] = abfilter(xk2,vk2,xm2,h,numh,mcv,alpha,beta );
         
         xkj2stack(i,:) = xkj2t;
         vkj2stack(i,:) = vkj2t;
