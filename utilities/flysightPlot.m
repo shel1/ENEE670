@@ -1,8 +1,18 @@
-function [ output_args ] = flysightPlot( varargin )
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
-    data = varargin{1};
-    [r c] = size(data);
+function flysightPlot( varargin )
+%FLYSIGHTPLOT Plot flysight output data
+% The preferred input is a vector of records created from fimport.m
+%%
+% FLYSIGHTPLOT(LoganData(x:y),ptype);
+% options for ptype
+% 1 formatted PVT plot, position and velocity
+% 2 3 D position only
+% 3 Location Derivative
+% 4 Down velocity with exit finder
+% 5 broken
+%
+
+    dat = varargin{1};
+    [r c] = size(dat);
     
     
     p = varargin{2};
@@ -15,8 +25,8 @@ function [ output_args ] = flysightPlot( varargin )
             hold all;
             grid on;
             for i = 1:c
-                exitIdx = getExit(data(i));
-                q3(data(i).jump.lat(exitIdx:end),data(i).jump.lon(exitIdx:end),data(i).jump.hMSL(exitIdx:end),data(i).jump.velN(exitIdx:end),jump.data(i).jump.velE(exitIdx:end),data(i).jump.velD(exitIdx:end));
+                [exitIdx,landIdx] = getExit(dat(i));
+                q3(dat(i).jump.lon(exitIdx:landIdx),dat(i).jump.lat(exitIdx:landIdx),dat(i).jump.hMSL(exitIdx:landIdx),dat(i).jump.velE(exitIdx:landIdx),dat(i).jump.velN(exitIdx:landIdx),(-1).*(dat(i).jump.velD(exitIdx:landIdx)));
                 title('Position & velocity');
             end
         case 2
@@ -27,7 +37,7 @@ function [ output_args ] = flysightPlot( varargin )
             grid on;
                         
             for i = 1:c
-                plot3(data(i).jump.lat,data(i).jump.lon,data(i).jump.hMSL);
+                plot3(dat(i).jump.lat,dat(i).jump.lon,dat(i).jump.hMSL);
                 title('Position only');
             end
         case 3
@@ -35,7 +45,7 @@ function [ output_args ] = flysightPlot( varargin )
             figure;
             hold all;
             for i = 1:c
-                plot(data(i).locDerivative,'.');
+                plot(dat(i).locDerivative,'.');
                 title({'LLA Derivative';'\DeltaT=.002s'});
             end
         case 4
@@ -49,8 +59,8 @@ function [ output_args ] = flysightPlot( varargin )
             ax2 = subplot(212);
             hold all;
             for i = 1:c
-                d = data(i).jump.velD;
-                exitIdx = getExit(data(i));
+                d = dat(i).jump.velD;
+                exitIdx = getExit(dat(i));
                 plot(ax2,d(exitIdx:end),'+');
                 hold all;
 %                 title({'Down Velocity'});
@@ -62,9 +72,9 @@ function [ output_args ] = flysightPlot( varargin )
             hold all;
             grid on;
             for i = 1:c
-                velDprime = diff(data(i).jump.velD);
+                velDprime = diff(dat(i).jump.velD);
                 exitIdx = find((velDprime>eT)&(velDprime<eTHigh),1);
-                plot3(data(i).lat(exitIdx:end),data(i).lon(exitIdx:end),data(i).hMSL(exitIdx:end));
+                plot3(dat(i).lat(exitIdx:end),dat(i).lon(exitIdx:end),dat(i).hMSL(exitIdx:end));
                 title('Position only');
             end            
         otherwise
