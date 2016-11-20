@@ -1,4 +1,4 @@
-function [ d ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
+function [ d, theta ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -38,7 +38,8 @@ function [ d ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
             xyDistance= 2*earthRadius*asin(sqrt(hav(deltaPhi)+cos(phi1)*cos(phi2)*hav(deltaLambda)));
             %relative slant range/proximity
             d = sqrt((xyDistance.^2)+(deltaAlt.^2));
-
+            theta = atan2(xyDistance, deltaAlt);
+            ang = (180/pi)*theta;
 
 end
 
