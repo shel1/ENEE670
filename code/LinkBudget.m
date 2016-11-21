@@ -7,13 +7,19 @@ function [ z, Lm, EbNo ] = LinkBudget(lat,lon,alt,lat2,lon2,alt2)
 Hz = 1.0;
 KHz = 1.0e3;
 MHz = 1e6;
-fs = 978*MHz; % frequency
-fb = 10^6; % bit rate 
+
+[d, theta] = geoDiff(lat,lon,alt,lat2,lon2,alt2);
+
+c = 299792458; % speed of light
+freq = 978*MHz; % frequency
+lambda =c/freq; % Wavelength
+
+% fb = 10^6; % bit rate 
 PTx = 20; % Transmit power at the Antenna in dBm
-AG_tx = 0; % Transmit Antenna gain  
+AG_tx = log10(sin(theta).^3); %allowance for angle relative to gnd rx antenna
 pl = 3; %Polarization loss
-z = 10*log10(0.3.^2./(4*pi()*geoDiff(lat,lon,alt,lat2,lon2,alt2).^2)); % Free space loss calculation
-AG_rx = 10; % Recieve Antenna gain
+z = 10*log10(lambda/(4*pi()*d.^2)); % Free space loss calculation
+% AG_rx = 10; % Recieve Antenna gain
 Pr = PTx + AG_tx + pl + z; % Recieved power
 Rs = -93; % Receive Antenna sensitivity for 90% message success rate in dBm
 Lm = Pr - Rs; % Link Margin

@@ -1,7 +1,8 @@
-function [ d ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
+function [ d, varargout ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
 %GEODIFF Find the slant range distance between two points in 3-D space.
 %   This function uses the law of haversines to approximate the distance
 %   between two points relative to Earth.
+%   11/20/16 Francis Add varargout for theta El angle
 
 
             % law of haversines
@@ -39,7 +40,8 @@ function [ d ] = geoDiff(lat,lon,alt,lat2,lon2,alt2)
             xyDistance= 2*earthRadius*asin(sqrt(hav(deltaPhi)+cos(phi1)*cos(phi2)*hav(deltaLambda)));
             %relative slant range/proximity
             d = sqrt((xyDistance.^2)+(deltaAlt.^2));
-
-
+            if nargout == 2
+                varargout{1} = atan2(deltaAlt, xyDistance);
+            end
 end
 
