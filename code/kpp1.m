@@ -51,6 +51,11 @@ function [out] = kpp1(varargin)
         case 5
             %everything passed in
             fprintf('All constants entered\n');
+            N = varargin{1};
+            sj = varargin{2};
+            radius = varargin{3};
+            lat = varargin{4};
+            lon = varargin{5};
     end
     
     LSB = 360/(2.^24);
