@@ -37,7 +37,7 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
     %reset the flux capacitor
     tClock = seconds(0);
     
-    %defind the alarm output struct
+    %define the alarm output struct
     alarmskel.v1 = [];
     alarmskel.v2 = [];
     alarmskel.dist = [];
@@ -127,9 +127,9 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 tClock = tClock+t;
                 idx1 = exitIdx1 + i;
                 idx2 = exitIdx2 + i;
+
                 %snip out one row of PV values
                 try
-                    
                     vv1t = table2array(vv1(idx1,2:7));
                     vv2t = table2array(vv2(idx2,2:7));
                 catch vv1err
@@ -167,10 +167,7 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 %time relative to the other jumper
                 [~,Lm(i),ebno(i)] = LinkBudget(vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2));
                 fD(i)= geoDiff(xkj1t(1),xkj1t(2),xkj1t(3),xkj2t(1),xkj2t(2),xkj2t(3)); 
-                if i == 197
-                    i;
-                end
-                
+
                if plotflag
                    % first plot the history 
                    plot3(ax1,vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),'m-.+',vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2),'m-.+');
@@ -214,12 +211,33 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                end
             end
             if plotflag
+                xvals = h:h:seconds(tClock);
                 figure;plot(rkj1stack(:,1),'.');
                 figure;plot(rkj1stack(:,2),'.');
                 figure;plot(rkj1stack(:,3),'.');
                 figure;plot(rkj2stack(:,1),'.');
                 figure;plot(rkj2stack(:,2),'.');
                 figure;plot(rkj2stack(:,3),'.');
+                
+                [~,jj]=find((abs(xvals-[alarmstruct.t]')<0.001));
+                figure;plot(xvals,gD,'b');
+                hold;
+                plot(xvals,fD,'m');
+                plot(xvals(jj),fD(jj),'ro');
+                legend('Actual Distance','16*h Future Estimated Distance','Proximity Alarm Condition');
+                ylabel('Distance (m)');
+                xlabel('Time (s)');
+                title('Relative Distance');
+                hold off;
+                figure;plot(xvals,Lm,'r');
+                hold;
+                plot(xvals,ebno,'g');
+                leg=legend('$$\textrm{Link Margin}$$','$$ \frac{E_b}{N_o}$$');
+                leg.Interpreter = 'latex';
+                xlabel('Time (s)');
+                ylabel('dB');
+                title('Link Margin and Bit Rate');
+                hold off;
             end
         else
             fprintf('J1 and J2 = %g\n',j1);
