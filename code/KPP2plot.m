@@ -37,9 +37,7 @@ figure
     xlabel('Range/ nm') % x- axis
     ylabel('Altitude/*1000') %y- axis
     grid on
- 
-
-           
+     
        
     
 
