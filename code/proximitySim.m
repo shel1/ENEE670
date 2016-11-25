@@ -25,6 +25,7 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
     %location of the airfield
     olat = 39.7054758;
     olon = -75.0330031;
+    oalt = 49; %meters
     %convert degrees to meters for our AOI
     [m2deglat,m2deglon] = findLocDelta(olat,olon,(1/1852));
     mcv = [m2deglat m2deglon 1];
@@ -106,8 +107,8 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
 
             gD = zeros(1,minlen);
             fD = zeros(1,minlen);
-            Lm = zeros(1,minlen);
-            ebno = zeros(1,minlen);
+            Lm = zeros(minlen,3);
+            ebno = zeros(minlen,3);
             if frameflag
                 plotframes = repmat(plotskel,1,minlen);
             end
@@ -165,7 +166,9 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 gD(i) = geoDiff(vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2));
                 %evaluate the link budget for the location and for that point in
                 %time relative to the other jumper
-                [~,Lm(i),ebno(i)] = LinkBudget(vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2));
+                [~,Lm(i,1),ebno(i,1)] = LinkBudget(vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2));
+                [~,Lm(i,2),ebno(i,2)] = LinkBudget(vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),olat,olon,oalt);
+                [~,Lm(i,3),ebno(i,3)] = LinkBudget(vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2),olat,olon,oalt);
                 fD(i)= geoDiff(xkj1t(1),xkj1t(2),xkj1t(3),xkj2t(1),xkj2t(2),xkj2t(3)); 
 
                if plotflag
@@ -224,16 +227,22 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 hold;
                 plot(xvals,fD,'m');
                 plot(xvals(jj),fD(jj),'ro');
-                legend('Actual Distance','16*h Future Estimated Distance','Proximity Alarm Condition');
+                legend('Actual Distance',[num2str(numh) '*h Future Estimated Distance'],'Proximity Alarm Condition');
                 ylabel('Distance (m)');
                 xlabel('Time (s)');
                 title('Relative Distance');
                 hold off;
-                figure;plot(xvals,Lm,'r');
+                figure;plot(xvals,Lm(:,1),'r');
                 hold;
+                plot(xvals,Lm(:,2),'m');
+                plot(xvals,Lm(:,3),'b');
                 plot(xvals,ebno,'g');
-                leg=legend('$$\textrm{Link Margin}$$','$$ \frac{E_b}{N_o}$$');
+                leg=legend('$$\textrm{Link Margin A-A}$$',...
+                    '$$\textrm{Link Margin A1-G}$$',...
+                    '$$\textrm{Link Margin A2-G}$$',...    
+                    '$$ \frac{E_b}{N_o}$$');
                 leg.Interpreter = 'latex';
+                leg.Location = 'Southwest';
                 xlabel('Time (s)');
                 ylabel('dB');
                 title('Link Margin and Bit Rate');

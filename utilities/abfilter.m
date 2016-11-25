@@ -1,6 +1,6 @@
 function [ xk,vk,rk ] = abfilter( xk1,vk1,xm,h,numh,mcv,alpha,beta )
 %ABFILTER Apply alpha beta filter to given position and velocity
-%   ALPHABETA(posvec,velvec,prevpos,step,stepMultiplier,unitconversion,alpha,beta)
+%   ABFILTER(posvec,velvec,prevpos,step,stepMultiplier,unitconversion,alpha,beta)
             
         xk = xk1 + (vk1.*(h*numh*mcv)); 
         vk = vk1;
