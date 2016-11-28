@@ -81,7 +81,7 @@ function [out] = kpp1(varargin)
     % only for the Mapping Toolbox    
     load('pStruct.mat');
   
-    R = []; % random number stack
+
     % so if the USA wasn't the center of the universe,we would care about
     % the rest here, and deal with the negative DD/DMS conversions 
 
@@ -102,8 +102,7 @@ function [out] = kpp1(varargin)
     vStructskel.zeroidx=zeros(1,sj);
     MSO = zeros(N,sj);
     Ttx = zeros(N,sj);
-%     sjtic = zeros(N,sj);
-%     mtic = zeros(1,sj);
+    R = zeros(N,sj); % random number stack
     sjtime = zeros(1,sj);
     mtime = repmat(tskel,N,sj);
     plotstack = repmat(plotskel,1,sj);
@@ -112,44 +111,21 @@ function [out] = kpp1(varargin)
     rowStack = skel100;%stacking up the lat/lon values
     for s = 1:sj
         % N number of trials for each sj
-
         sjtic = tic;
         for m = 0:N
             m1 = m+1;
             mtic = tic;
-
             [latSttmp,lonSttmp, trash, ct]= posGenWrapper(lat,lon,deltaLat,deltaLon,ct,trash,radius);            
-            
             % do all the math in advance
             rData(1,m1,s)= latSttmp.val;
             rData(2,m1,s)= lonSttmp.val;
-            
             newRow = [latSttmp;lonSttmp];
             rowStack = [newRow; rowStack(1:end-2)];
-
-            % reset the term index and zero out the math, in case of a
-            % hiccup
-            tidx = mod(m1,2)+1;
-            term1 = 0;
-            term2 = 0;
-            switch m
-                case 0 
-                    Rzero = mod(newRow(1).b2d,3200);
-                    R(1,s) = Rzero;
-                    R(m1,s) = 752 + R(1,s);
-                case 1
-                    term1 = 4001*R(m1-1,s);
-                    term2 = newRow(tidx).b2d;
-                    R(m1,s) = mod(term1+term2,3200);
-                otherwise
-                    % anything other than m=0 or m=1
-                    term1 = 4001*R(m1-1);
-                    term2 = newRow(tidx).b2d;
-                    R(m1,s) = mod(term1+term2,3200);
+            if m == 0
+                [MSO(m1,s),R(m1,s), Ttx(m1,s)] = msoGenerator(newRow,m,[]);
+            else
+                [MSO(m1,s),R(m1,s), Ttx(m1,s)] = msoGenerator(newRow,m,R(m1-1));
             end
-                        
-            MSO(m1,s)    =   752+R(m1,s);
-            Ttx(m1,s)    =   (6000+ (250*MSO(m1,s)))*1e-6;%convert to µs
             mtime(m1,s).t=toc(mtic);
             mtime(m1,s).trash = trash;
             mtime(m1,s).ct = ct;
@@ -176,11 +152,11 @@ function [out] = kpp1(varargin)
         plotstack(x) = F;
         clf;
     end
-    
 
     vStructMSO = [validateCapacity(MSO)]';
     out.rData = rData;
     out.MSO = MSO;
+    out.R = R;
     out.Ttx = Ttx;
     out.NVals = NVals;
     out.mtime = mtime;

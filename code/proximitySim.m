@@ -109,6 +109,8 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
             fD = zeros(1,minlen);
             Lm = zeros(minlen,3);
             ebno = zeros(minlen,3);
+            R = zeros(minlen,2);
+            MSO = zeros(minlen,2);
             if frameflag
                 plotframes = repmat(plotskel,1,minlen);
             end
@@ -141,7 +143,6 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 xk1 = vv1t(:,1:3); %pos data
                 vk1 = vv1t(:,4:6); %vel data
                 xm = table2array(vv1(idx1-1,2:4)); %previous value
-                
 
                 %special sauce
                 [xkj1t,vkj1t,rkj1t] = abfilter(xk1,vk1,xm,h,numh,mcv,alpha,beta );
@@ -155,13 +156,24 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 xk2 = vv2t(:,1:3);
                 vk2 = vv2t(:,4:6);
                 xm2 = table2array(vv2(idx2-1,2:4));
-
+                xk2conv = posconv(xk2(1),xk2(2));
                 [xkj2t,vkj2t,rkj2t] = abfilter(xk2,vk2,xm2,h,numh,mcv,alpha,beta );
 
                 xkj2stack(i,:) = xkj2t;
                 vkj2stack(i,:) = vkj2t;
                 rkj2stack(i,:) = rkj2t;        
 
+                [latconv(1),lonconv(1)] = posconv(xk1(1),xk1(2));
+                [latconv(2),lonconv(2)] = posconv(xk2(1),xk2(2));
+                tPos(:,:,i) = [latconv;lonconv];
+                if i == 1
+                    [MSO(i,1),R(i,1),Ttx(i,1)] = msoGenerator(tPos(:,1,i),i-1,[]);
+                    [MSO(i,2),R(i,2),Ttx(i,2)] = msoGenerator(tPos(:,2,i),i-1,[]);
+                else
+                    [MSO(i,1),R(i,1),Ttx(i,1)] = msoGenerator(tPos(:,1,i),i-1,R(i,1));
+                    [MSO(i,2),R(i,2),Ttx(i,2)] = msoGenerator(tPos(:,2,i),i-1,R(i,2));
+                    
+                end
                 %find current actual range difference
                 gD(i) = geoDiff(vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2));
                 %evaluate the link budget for the location and for that point in
@@ -263,6 +275,10 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
     outStruct.gD = gD;
     outStruct.lm = Lm;
     outStruct.ebno = ebno;
+    outStruct.MSO = MSO;
+    outStruct.Ttx = Ttx;
+    outStruct.R = R;
+    outStruct.tpos = tPos;
     outStruct.alarmstruct = alarmstruct;
     if frameflag
         outStruct.pf = plotframes;

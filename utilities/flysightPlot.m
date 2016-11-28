@@ -76,7 +76,23 @@ function flysightPlot( varargin )
                 exitIdx = find((velDprime>eT)&(velDprime<eTHigh),1);
                 plot3(dat(i).lat(exitIdx:end),dat(i).lon(exitIdx:end),dat(i).hMSL(exitIdx:end));
                 title('Position only');
-            end            
+            end
+        case 6
+            % plot MSOs vs altitude
+            figure;
+            hold all;
+            grid on;
+            subplot(511);
+            plot(dat.jump.MSOs,'.');
+            subplot(512);
+            plot(dat.jump.hMSL);
+            subplot(513);
+            plot(dat.jump.velN);            
+            subplot(514);
+            plot(dat.jump.velE);            
+            subplot(515);
+            plot(dat.jump.velD);
+            hold off;
         otherwise
             msg = ['I''m a failure because: ' why];
             error(msg);
