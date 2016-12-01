@@ -33,7 +33,7 @@ lambda =c/freq; % Wavelength
 
 % fb = 10^6; % bit rate 
 PTx = 20; % Transmit power at the Antenna in dBm
-AG_tx = log10(abs(sin(theta).^3)); %allowance for angle relative to gnd rx antenna
+AG_tx = 10*log10(abs(sin(theta).^3)); %allowance for angle relative to gnd rx antenna
 pl = 3; %Polarization loss
 z = 10*log10(abs(lambda/(4*pi*d.^2))); % Free space loss calculation
 % AG_rx = 10; % Recieve Antenna gain
