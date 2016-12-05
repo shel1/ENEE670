@@ -15,16 +15,17 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
 %           use imshow(outStruct.pf(x).cdata) to display
 % 
     % condition input data
-    close all;
+  
     
     plotflag=1;
     frameflag = 0;
     safeRadius = 100; %meters
     h = 0.20; %flysight sample rate
     t = seconds(h);
-    %location of the airfield
+    %location of the airfield (and Rx antenna)
     olat = 39.7054758;
     olon = -75.0330031;
+    oalt = 49; %meters
     %convert degrees to meters for our AOI
     [m2deglat,m2deglon] = findLocDelta(olat,olon,(1/1852));
     mcv = [m2deglat m2deglon 1];
@@ -37,7 +38,7 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
     %reset the flux capacitor
     tClock = seconds(0);
     
-    %defind the alarm output struct
+    %define the alarm output struct
     alarmskel.v1 = [];
     alarmskel.v2 = [];
     alarmskel.dist = [];
@@ -56,7 +57,7 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
     %find the exit and landing points during each jump
     [exitIdx1,lndIdx1] = getExit(in(j1));
     [exitIdx2,lndIdx2] = getExit(in(j2));
-
+    exErr = 200;
     try
         if j1 ~= j2 %add a little validation, in case a loop is used outside of the function
             data1 = in(j1);
@@ -65,11 +66,12 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
             if plotflag
                 
                 figure(100);
-                plot(data1.jump.hMSL(exitIdx1:end));
+                plot(data1.jump.hMSL(exitIdx1-200:end));
                 hold;
-                plot(data2.jump.hMSL(exitIdx2:end));
-                plot(lndIdx1-exitIdx1,data1.jump.hMSL(lndIdx1),'o');
-                plot(lndIdx2-exitIdx2,data2.jump.hMSL(lndIdx2),'v');
+                plot(data2.jump.hMSL(exitIdx2-200:end));
+                plot(lndIdx1-exitIdx1+100,data1.jump.hMSL(lndIdx1),'o');
+                plot(lndIdx2-exitIdx2+100,data2.jump.hMSL(lndIdx2),'v');
+                
                 hold off;
             end
             fprintf('Starting %g\n',j2);                
@@ -98,16 +100,19 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
             % spelled out for readability
 
             %determine how much to preallocate
-            v1len = height(vv1);
-            v2len = height(vv2);
-            len1 = (lndIdx1-exitIdx1);
-            len2 = (lndIdx2-exitIdx2);
+%             v1len = height(vv1);
+%             v2len = height(vv2);
+            
+            len1 = (lndIdx1-exitIdx1+exErr);
+            len2 = (lndIdx2-exitIdx2+exErr);
             minlen = max(len1,len2);
 
             gD = zeros(1,minlen);
             fD = zeros(1,minlen);
-            Lm = zeros(1,minlen);
-            ebno = zeros(1,minlen);
+            Lm = zeros(minlen,3);
+            ebno = zeros(minlen,3);
+%             R = zeros(minlen,2);
+%             MSO = zeros(minlen,2);
             if frameflag
                 plotframes = repmat(plotskel,1,minlen);
             end
@@ -125,11 +130,13 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 %dataset
 
                 tClock = tClock+t;
-                idx1 = exitIdx1 + i;
-                idx2 = exitIdx2 + i;
+%                 idx1 = exitIdx1 + i;
+%                 idx2 = exitIdx2 + i;
+                idx1 = lndIdx1-minlen + i;
+                idx2 = lndIdx2-minlen + i;
+
                 %snip out one row of PV values
                 try
-                    
                     vv1t = table2array(vv1(idx1,2:7));
                     vv2t = table2array(vv2(idx2,2:7));
                 catch vv1err
@@ -140,7 +147,6 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 xk1 = vv1t(:,1:3); %pos data
                 vk1 = vv1t(:,4:6); %vel data
                 xm = table2array(vv1(idx1-1,2:4)); %previous value
-                
 
                 %special sauce
                 [xkj1t,vkj1t,rkj1t] = abfilter(xk1,vk1,xm,h,numh,mcv,alpha,beta );
@@ -154,23 +160,33 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 xk2 = vv2t(:,1:3);
                 vk2 = vv2t(:,4:6);
                 xm2 = table2array(vv2(idx2-1,2:4));
-
+%                 xk2conv = posconv(xk2(1),xk2(2));
                 [xkj2t,vkj2t,rkj2t] = abfilter(xk2,vk2,xm2,h,numh,mcv,alpha,beta );
 
                 xkj2stack(i,:) = xkj2t;
                 vkj2stack(i,:) = vkj2t;
                 rkj2stack(i,:) = rkj2t;        
 
+                [latconv(1),lonconv(1)] = posconv(xk1(1),xk1(2));
+                [latconv(2),lonconv(2)] = posconv(xk2(1),xk2(2));
+%                 tPos(:,:,i) = [latconv;lonconv];
+%                 if i == 1
+%                     [MSO(i,1),R(i,1),Ttx(i,1)] = msoGenerator(tPos(:,1,i),i-1,[]);
+%                     [MSO(i,2),R(i,2),Ttx(i,2)] = msoGenerator(tPos(:,2,i),i-1,[]);
+%                 else
+%                     [MSO(i,1),R(i,1),Ttx(i,1)] = msoGenerator(tPos(:,1,i),i-1,R(i,1));
+%                     [MSO(i,2),R(i,2),Ttx(i,2)] = msoGenerator(tPos(:,2,i),i-1,R(i,2));
+%                     
+%                 end
                 %find current actual range difference
                 gD(i) = geoDiff(vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2));
                 %evaluate the link budget for the location and for that point in
                 %time relative to the other jumper
-                [~,Lm(i),ebno(i)] = LinkBudget(vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2));
+                [~,Lm(i,1),ebno(i,1)] = LinkBudget(vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2));
+                [~,Lm(i,2),ebno(i,2)] = LinkBudget(vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),olat,olon,oalt);
+                [~,Lm(i,3),ebno(i,3)] = LinkBudget(vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2),olat,olon,oalt);
                 fD(i)= geoDiff(xkj1t(1),xkj1t(2),xkj1t(3),xkj2t(1),xkj2t(2),xkj2t(3)); 
-                if i == 197
-                    i;
-                end
-                
+
                if plotflag
                    % first plot the history 
                    plot3(ax1,vv1.lat(idx1),vv1.lon(idx1),vv1.hMSL(idx1),'m-.+',vv2.lat(idx2),vv2.lon(idx2),vv2.hMSL(idx2),'m-.+');
@@ -214,12 +230,65 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                end
             end
             if plotflag
-                figure;plot(rkj1stack(:,1),'.');
-                figure;plot(rkj1stack(:,2),'.');
-                figure;plot(rkj1stack(:,3),'.');
-                figure;plot(rkj2stack(:,1),'.');
-                figure;plot(rkj2stack(:,2),'.');
-                figure;plot(rkj2stack(:,3),'.');
+                xvals = h:h:seconds(tClock);
+                figure;plot(xvals,rkj1stack(:,1),'.');
+                title('Jumper 1 X Axis Residuals');
+                hold on;
+                xlabel('Time (s)');
+                ylabel('Residual Difference (m)');
+                figure;plot(xvals,rkj1stack(:,2),'.');
+                hold on;
+                title('Jumper 1 Y Axis Residuals');
+                xlabel('Time (s)');
+                ylabel('Residual Difference (m)');                
+                figure;plot(xvals,rkj1stack(:,3),'.');
+                hold on;
+                xlabel('Time (s)');
+                ylabel('Residual Difference (m)');                
+                title('Jumper 1 Z Axis Residuals');
+                figure;plot(xvals,rkj2stack(:,1),'.');
+                hold on;
+                xlabel('Time (s)');
+                ylabel('Residual Difference (m)');                
+                title('Jumper 2 X Axis Residuals');
+                figure;plot(xvals,rkj2stack(:,2),'.');
+                hold on;
+                xlabel('Time (s)');
+                ylabel('Residual Difference (m)');                
+                title('Jumper 2 Y Axis Residuals');
+                figure;plot(xvals,rkj2stack(:,3),'.');
+                hold on;
+                xlabel('Time (s)');
+                ylabel('Residual Difference (m)');                
+                title('Jumper 2 Z Axis Residuals');
+                
+                
+                
+                [~,jj]=find((abs(xvals-[alarmstruct.t]')<0.001));
+                figure;plot(xvals,gD,'b');
+                hold;
+                plot(xvals,fD,'m');
+                plot(xvals(jj),fD(jj),'ro');
+                legend('Actual Distance',[num2str(numh) '*h Future Estimated Distance'],'Proximity Alarm Condition');
+                ylabel('Distance (m)');
+                xlabel('Time (s)');
+                title('Relative Distance');
+                hold off;
+                figure;plot(xvals,Lm(:,1),'r');
+                hold;
+                plot(xvals,Lm(:,2),'m');
+                plot(xvals,Lm(:,3),'b');
+                plot(xvals,ebno,'g');
+                leg=legend('$$\textrm{Link Margin A-A}$$',...
+                    '$$\textrm{Link Margin A1-G}$$',...
+                    '$$\textrm{Link Margin A2-G}$$',...    
+                    '$$ \frac{E_b}{N_o}$$');
+                leg.Interpreter = 'latex';
+                leg.Location = 'Southwest';
+                xlabel('Time (s)');
+                ylabel('dB');
+                title('Link Margin and Bit Rate');
+                hold off;
             end
         else
             fprintf('J1 and J2 = %g\n',j1);
@@ -236,6 +305,10 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
     outStruct.gD = gD;
     outStruct.lm = Lm;
     outStruct.ebno = ebno;
+%     outStruct.MSO = MSO;
+%     outStruct.Ttx = Ttx;
+%     outStruct.R = R;
+%     outStruct.tpos = tPos;
     outStruct.alarmstruct = alarmstruct;
     if frameflag
         outStruct.pf = plotframes;

@@ -71,7 +71,7 @@ function [ outputData ] = fimport( folderStr )
             outputData(j).meanhAcc = mean(tmpTable.hAcc);
             outputData(j).meanhScc = mean(tmpTable.sAcc);            
             tmpTable.time = datetime(tmpTable.time,'Format','uuuu-MM-dd''T''HH:mm:ss.SS''Z');
-
+            [tmpTable.MSO,~,~] = msoGenerator(tmpTable,1);
             %let the games begin
             locDerivative = [];
             [r,~] = size(tmpTable);

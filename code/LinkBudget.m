@@ -43,4 +43,3 @@ Lm = Pr - Rs; % Link Margin
 EbNo = 0;
 
 end
-
