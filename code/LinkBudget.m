@@ -16,7 +16,7 @@ switch nargin
         theta = varargin{1};
         d = varargin{2};
     otherwise
-        fprint('something went sideways\n');
+        fprintf('something went sideways\n');
         why;
 end
     
@@ -31,16 +31,16 @@ c = 299792458; % speed of light
 freq = 978*MHz; % frequency
 lambda =c/freq; % Wavelength
 
-% fb = 10^6; % bit rate 
+% fb = 10^-6; % bit rate 
 PTx = 20; % Transmit power at the Antenna in dBm
 AG_tx = 10*log10(abs(sin(theta).^3)); %allowance for angle relative to gnd rx antenna
 pl = 3; %Polarization loss
-z = 10*log10(abs(lambda/(4*pi*d.^2))); % Free space loss calculation
+z = 10*log10(abs(lambda/(4*(pi/2)*d.^2))); % Free space loss calculation
 % AG_rx = 10; % Recieve Antenna gain
 Pr = PTx + AG_tx + pl + z; % Recieved power
 Rs = -93; % Receive Antenna sensitivity for 90% message success rate in dBm
 Lm = Pr - Rs; % Link Margin
-EbNo = 10*log10(Lm);
+EbNo = 0;
 
 end
 
