@@ -40,7 +40,7 @@ z = 10*log10(abs(lambda/(4*pi*d.^2))); % Free space loss calculation
 Pr = PTx + AG_tx + pl + z; % Recieved power
 Rs = -93; % Receive Antenna sensitivity for 90% message success rate in dBm
 Lm = Pr - Rs; % Link Margin
-EbNo = 10*log10(Lm);
+EbNo = 0;
 
 end
 
