@@ -69,9 +69,9 @@ hold all;
 semilogy(rad2deg(xx),mLm);
 
 grid on;
-figure;
-%sinc plot
-yyy=20*log10(sin(xxxx)./xxxx);
-plot(xxxx,yyy);
-hold;
-grid on;
+% figure;
+% %sinc plot
+% yyy=20*log10(sin(xxxx)./xxxx);
+% plot(xxxx,yyy);
+% hold;
+% grid on;
