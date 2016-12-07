@@ -263,7 +263,7 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 title('Jumper 2 Z Axis Residuals');
                 
                 
-                
+                % fun with floating point math
                 [~,jj]=find((abs(xvals-[alarmstruct.t]')<0.001));
                 figure;plot(xvals,gD,'b');
                 hold;
@@ -273,21 +273,22 @@ function [ outStruct ] = proximitySim(in, j1,j2 )
                 ylabel('Distance (m)');
                 xlabel('Time (s)');
                 title('Relative Distance');
+                grid on;
                 hold off;
-                figure;plot(xvals,Lm(:,1),'r');
+                figure;
+                semilogy(xvals,Lm(:,1),'r');
                 hold;
-                plot(xvals,Lm(:,2),'m');
-                plot(xvals,Lm(:,3),'b');
-                plot(xvals,ebno,'g');
+                semilogy(xvals,Lm(:,2),'m');
+                semilogy(xvals,Lm(:,3),'b');
+                grid on;
                 leg=legend('$$\textrm{Link Margin A-A}$$',...
                     '$$\textrm{Link Margin A1-G}$$',...
-                    '$$\textrm{Link Margin A2-G}$$',...    
-                    '$$ \frac{E_b}{N_o}$$');
+                    '$$\textrm{Link Margin A2-G}$$');
                 leg.Interpreter = 'latex';
-                leg.Location = 'Southwest';
+                leg.Location = 'Southeast';
                 xlabel('Time (s)');
                 ylabel('dB');
-                title('Link Margin and Bit Rate');
+                title('Link Margin');
                 hold off;
             end
         else

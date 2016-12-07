@@ -7,7 +7,7 @@ function msoAnalysis(dat)
 %  Y5:  hMSL
     [jdat] = extractFlysightData(dat);
     
-    Y1 = jdat.MSOs;
+    Y1 = jdat.MSO;
     Y2 = jdat.velN;
     Y3 = jdat.velE;
     Y4 = jdat.velD;
@@ -44,10 +44,11 @@ box(axes2,'on');
 % Set the remaining axes properties
 
 % Create title
-title('velE');
+
 axes3 = axes('Parent',figure1);
 % Create plot
 plot(Y3,'Parent',axes3);
+title('velE');
 hold(axes3,'on');
 box(axes3,'on');
 % Set the remaining axes properties
