@@ -2,7 +2,7 @@
 
 % xx = linspace(0,(pi/2),1000);
 % theta in radians
-xx = -pi/2:pi/500:pi/2;
+xx = 0:pi/500:pi;
 % for the sinc plot
 xxxx = -10*pi/2:pi/500:10*pi/2;
 % qq = linspace(100,2000,100);
@@ -36,7 +36,7 @@ yl=ylabel('$$\textrm{Link Margin (dB)}$$');
 yl.Interpreter = 'latex';
 t1=title('$$\textrm{Link Margin Overview}$$');
 t1.Interpreter = 'latex';
-ylim([27 85]);
+% ylim([27 85]);
 legend('10m','100m','1km','2km');
 
 
@@ -52,7 +52,7 @@ xl=xlabel('$$\theta_{El}$$');
 xl.Interpreter = 'latex';
 yl=ylabel('$$\textrm{Link Margin (dB)}$$');
 yl.Interpreter = 'latex';
-xlim([-10 10]);
+% xlim([-10 10]);
 % ylim([27 80]);
 ylim([27 34]);
 t1=title('$$\textrm{Link Margin Detail}$$');

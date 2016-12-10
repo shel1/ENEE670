@@ -11,33 +11,29 @@ switch nargin
         lat2 = varargin{4};
         lon2 = varargin{5};
         alt2 = varargin{6};
-        [d, theta] = geoDiff(lat,lon,alt,lat2,lon2,alt2);
+        [R, theta] = geoDiff(lat,lon,alt,lat2,lon2,alt2);
     case 2
         theta = varargin{1};
-        d = varargin{2};
+        R = varargin{2};
     otherwise
         fprintf('something went sideways\n');
         why;
 end
     
 %% Units
-Hz = 1.0;
-KHz = 1.0e3;
+
 MHz = 1e6;
-
-
-
 c = 299792458; % speed of light
 freq = 978*MHz; % frequency
 lambda =c/freq; % Wavelength
 
 % fb = 10^-6; % bit rate 
 PTx = 20; % Transmit power at the Antenna in dBm
-AG_tx = 10*log10(abs(-sin((pi/2)-theta).^3)); %allowance for angle relative to gnd rx antenna
+AG_tx = 10*log10(abs(sin((pi/2)-theta).^3)); %allowance for angle relative to gnd rx antenna
 pl = 3; %Polarization loss
-z = 20*log10(abs(lambda/(4*(pi/2)*d))); % Free space loss calculation
+z = 20*log10((4*pi*R/lambda)); % Free space loss calculation
 % AG_rx = 10; % Recieve Antenna gain
-Pr = PTx + AG_tx + pl + z; % Recieved power
+Pr = PTx + AG_tx + pl - z; % Recieved power
 Rs = -93; % Receive Antenna sensitivity for 90% message success rate in dBm
 Lm = Pr - Rs; % Link Margin
 EbNo = 0;

@@ -1,6 +1,6 @@
 function [ newMSO, Rm, Ttx ] = msoGenerator( varargin )
 %MSOGENERATOR Generate ADS-B Message Start Opportunities
-%   Detailed explanation goes here
+
 
     switch nargin
         case {1,2}
