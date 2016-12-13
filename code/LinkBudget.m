@@ -32,11 +32,11 @@ freq = 978*MHz; % frequency
 lambda =c/freq; % Wavelength
 
 % fb = 10^-6; % bit rate 
-PTx = 23; % Transmit power at the Antenna in dBm
+PTx = 20; % Transmit power at the Antenna in dBm
 AG_tx = 10*log10(abs(sin(theta).^3)); %allowance for angle relative to gnd rx antenna
 pl = 0; %Polarization loss
 z = 20*log10(abs(lambda/(4*(pi/2)*d.^2))); % Free space loss calculation
-AG_rx = 7; % Recieve Antenna gain
+AG_rx = 0; % Recieve Antenna gain
 Pr = PTx + AG_tx + pl + z + AG_rx; % Recieved power
 Rs = -93; % Receive Antenna sensitivity for 90% message success rate in dBm
 Lm = Pr - Rs; % Link Margin
