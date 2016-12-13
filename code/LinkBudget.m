@@ -3,7 +3,8 @@ function [ z, Lm, EbNo ] = LinkBudget(varargin)
 %   [ outStruct ] = linkBudget(varargin)
 % Link Budget 
 %   Function accepts range values as input and calculate the
-%   Signal-to-Noise or Energy bit per unit noise
+%   the link margin with free space path loss, antenna plorization loss,
+%   and elevation angle loss.
 %   z = Free Space Path Loss
 %   Lm = Link Margin
 
