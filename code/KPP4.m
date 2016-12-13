@@ -1,8 +1,13 @@
-%KPP4.m
+%% KPP4.m
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Matt and Francis 
+% Date: 12/12/2016
+% Documentation updates 
+%%%%%%%%%%%%%%%%%%%%%%%%
 
 % xx = linspace(0,(pi/2),1000);
 % theta in radians
-xx = 0:pi/500:pi;
+xx = -pi/2:pi/500:pi/2;
 % for the sinc plot
 xxxx = -10*pi/2:pi/500:10*pi/2;
 % qq = linspace(100,2000,100);
@@ -36,7 +41,7 @@ yl=ylabel('$$\textrm{Link Margin (dB)}$$');
 yl.Interpreter = 'latex';
 t1=title('$$\textrm{Link Margin Overview}$$');
 t1.Interpreter = 'latex';
-% ylim([27 85]);
+ylim([27 85]);
 legend('10m','100m','1km','2km');
 
 
@@ -52,14 +57,14 @@ xl=xlabel('$$\theta_{El}$$');
 xl.Interpreter = 'latex';
 yl=ylabel('$$\textrm{Link Margin (dB)}$$');
 yl.Interpreter = 'latex';
-% xlim([-10 10]);
+xlim([-10 10]);
 % ylim([27 80]);
 ylim([27 34]);
 t1=title('$$\textrm{Link Margin Detail}$$');
 t1.Interpreter = 'latex';
 legend('10m','100m','1km','2km');
 
-mLm = Lm(:,100)-max(Lm(:,100));
+mLm = Lm(:,100)- max(Lm(:,100));
 figure;
 % semilogy(rad2deg(xx),Lm(:,1));
 hold all;
@@ -69,6 +74,8 @@ hold all;
 semilogy(rad2deg(xx),mLm);
 
 grid on;
+xlabel('\theta_{El}');
+ylabel('\textrm{Link Margin (dB)}');
 % figure;
 % %sinc plot
 % yyy=20*log10(sin(xxxx)./xxxx);
