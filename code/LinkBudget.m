@@ -1,7 +1,11 @@
 function [ z, Lm, EbNo ] = LinkBudget(varargin)
+%LINKBUDGET Summary of this function goes here
+%   [ outStruct ] = linkBudget(varargin)
 % Link Budget 
 %   Function accepts range values as input and calculate the
 %   Signal-to-Noise or Energy bit per unit noise
+%   z = Free Space Path Loss
+%   Lm = Link Margin
 
 switch nargin 
     case 6
