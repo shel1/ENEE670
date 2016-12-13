@@ -5,14 +5,13 @@
 % Documentation updates 
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-% xx = linspace(0,(pi/2),1000);
+%%
 % theta in radians
 xx = -pi/2:pi/500:pi/2;
-% for the sinc plot
-xxxx = -10*pi/2:pi/500:10*pi/2;
-% qq = linspace(100,2000,100);
+%%
 % range values
 qq = 10:10:2000;
+%%
 % matlab barfs if you don't declare them first
 z = [];
 Lm = [];
@@ -21,11 +20,7 @@ ebno = [];
 for i = 1:501
     for j = 1:200
     [z(i,j),Lm(i,j),ebno(i,j)] = LinkBudget(xx(i),qq(j));
-%     [z(i),Lm(i),ebno(i)] = LinkBudget(xx(i),500);
-
     end
-%     plot(qq,Lm);
-%     hold all;
 end
     
 figure;
@@ -76,9 +71,3 @@ semilogy(rad2deg(xx),mLm);
 grid on;
 xlabel('\theta_{El}');
 ylabel('\textrm{Link Margin (dB)}');
-% figure;
-% %sinc plot
-% yyy=20*log10(sin(xxxx)./xxxx);
-% plot(xxxx,yyy);
-% hold;
-% grid on;
