@@ -1,7 +1,7 @@
 function flysightPlot( varargin )
 %FLYSIGHTPLOT Plot flysight output data
 % The preferred input is a vector of records created from fimport.m
-%%
+%
 % FLYSIGHTPLOT(LoganData(x:y),ptype);
 % options for ptype
 % 1 formatted PVT plot, position and velocity
