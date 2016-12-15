@@ -108,7 +108,7 @@ function [out] = kpp1(varargin)
     R = zeros(N,sj); % random number stack
     sjtime = zeros(1,sj);
     mtime = repmat(tskel,N,sj);
-    plotstack = repmat(plotskel,1,sj);
+%     plotstack = repmat(plotskel,1,N);
     %% 
     % Set up the random number stream
     rStream = RandStream('mlfg6331_64');
@@ -159,8 +159,8 @@ function [out] = kpp1(varargin)
         plotm(latc,lonc,'g'); % plot the range
         plotm(squeeze(rData(1,x,:)),squeeze(rData(2,x,:)),'r.');
         title(titlestr);
-        F = getframe;
-        plotstack(x) = F;
+%         F = getframe;
+%         plotstack(x) = F;
         clf;
     end
     
@@ -176,7 +176,7 @@ function [out] = kpp1(varargin)
     out.mtime = mtime;
     out.sjtime = sjtime;
     out.vStructMSO = vStructMSO;
-    out.plotframes = plotstack;
+%     out.plotframes = plotstack;
     %% Plot the results of the validation
     figure;
     histogram([vStructMSO.dupeCount]);

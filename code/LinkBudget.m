@@ -1,5 +1,7 @@
 function [ z, Lm, EbNo ] = LinkBudget(varargin)
-%LINKBUDGET Summary of this function goes here
+%LINKBUDGET Evaluate HawkEye link budget for given geographic points or
+%range and el angle
+%   Calculations assume a short dipole antenna pattern tuned for 978 MHz
 %   [ outStruct ] = linkBudget(varargin)
 % Link Budget 
 %   Function accepts range values as input and calculate the
@@ -41,6 +43,6 @@ z = 20*log10((4*pi*R/lambda)); % Free space loss calculation
 Pr = PTx + AG_tx + pl - z; % Recieved power
 Rs = -93; % Receive Antenna sensitivity for 90% message success rate in dBm
 Lm = Pr - Rs; % Link Margin
-EbNo = 0;
+EbNo = 0; % eliminated from analysis
 
 end

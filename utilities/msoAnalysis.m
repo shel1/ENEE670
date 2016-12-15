@@ -1,5 +1,5 @@
 function msoAnalysis(dat)
-%CREATEFIGURE(Y1, Y2, Y3, Y4, Y5)
+%MSOANALYSIS(Y1, Y2, Y3, Y4, Y5)
 %  Y1:  MSOs
 %  Y2:  velN
 %  Y3:  velE

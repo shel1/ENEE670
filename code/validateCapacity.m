@@ -7,7 +7,7 @@ function [ odat ] = validateCapacity( dat )
 %   the data are integers or floats. They're stored the same.
     [r c] = size(dat);
     odat = struct();
-    % dake difference between columns
+    % Take difference between columns
     for ii=1:c
         for jj=1:c
             tempdiff= diff([dat(:,ii) dat(:,jj)],1,2);

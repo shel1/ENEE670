@@ -1,3 +1,5 @@
+%% KPP2 Output
+close all;
 [ d, varargout ] = geoDiff(0,0,0,39.7716, -74.9285, 1001);
 %This function calculates the distance, and angles of each of the skydivers
 %by taking a slice of data in dat array and computing it at each iteration. 
@@ -13,7 +15,7 @@ al = 0;
 rg = 0; 
 
 dat =zeros(35,11); 
-figure;
+% figure;
 %Loop for the altitude and range and link budget
 for b_range = 1:11 
     al = 0; 
@@ -23,15 +25,15 @@ for b_range = 1:11
         [~,dat(alt_1+1,b_range),~] = LinkBudget(0,0,0,0,rg,al);
     end
     j = b_range*ones(1,11); 
-    plot(j,dat(b_range,:),'-+'); 
-    hold all
+%     plot(j,dat(b_range,:),'-+'); 
+%     hold all
     rg = rg +h; 
 end
 %Title
-title('Plot of Range against Altitude')
-xlabel('Range (nm)') 
-ylabel('Altitude (ft*1000)') 
-grid on
+% title('Plot of Range against Altitude')
+% xlabel('Range (nm)') 
+% ylabel('Altitude (ft*1000)') 
+% grid on
 figure
       for x= 1:10
           semilogy(dat(:,x),'-+');
@@ -41,7 +43,25 @@ figure
     title ('Plot of the Link Margin against Range') 
     xlabel('Altitude (ft*1000)') 
     ylabel('Link Margin (dB)') 
-    grid on
+    grid on;
+    %% Shelton 
+    % Update 12/14/2016
+    xlim([0 7]);
+    hold off;
+   %% 
+   % Plot reveals $\Delta SNR$ required to close link
+    figure;
+    
+    for x= 1:10
+        plot(dat(:,x));
+        hold all;
+    end
+    grid on;
+    title('Linear Plot of Link Margin');
+    ylabel('Link Margin (dB)');
+    xlabel('Altitude (x 1000)');
+    hold off;
+
     
 
            
