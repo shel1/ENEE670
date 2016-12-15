@@ -1,23 +1,48 @@
-function [ z, Lm, EbNo ] = LinkBudget(lat,lon,alt,lat2,lon2,alt2)
+function [ z, Lm, EbNo ] = LinkBudget(varargin)
+%LINKBUDGET Evaluate HawkEye link budget for given geographic points or
+%range and el angle
+%   Calculations assume a short dipole antenna pattern tuned for 978 MHz
+%   [ outStruct ] = linkBudget(varargin)
 % Link Budget 
 %   Function accepts range values as input and calculate the
-%   Signal-to-Noise or Energy bit per unit noise
+%   the link margin with free space path loss, antenna plorization loss,
+%   and elevation angle loss.
+%   z = Free Space Path Loss
+%   Lm = Link Margin
 
+switch nargin 
+    case 6
+        lat = varargin{1};
+        lon = varargin{2};
+        alt = varargin{3};
+        lat2 = varargin{4};
+        lon2 = varargin{5};
+        alt2 = varargin{6};
+        [R, theta] = geoDiff(lat,lon,alt,lat2,lon2,alt2);
+    case 2
+        theta = varargin{1};
+        R = varargin{2};
+    otherwise
+        fprintf('something went sideways\n');
+        why;
+end
+    
 %% Units
-Hz = 1.0;
-KHz = 1.0e3;
+
 MHz = 1e6;
-fs = 978*MHz; % frequency
-fb = 10^6; % bit rate 
+c = 299792458; % speed of light
+freq = 978*MHz; % frequency
+lambda =c/freq; % Wavelength
+
+% fb = 10^-6; % bit rate 
 PTx = 20; % Transmit power at the Antenna in dBm
-AG_tx = 0; % Transmit Antenna gain  
+AG_tx = 10*log10(abs(sin((pi/2)-theta).^3)); %allowance for angle relative to gnd rx antenna
 pl = 3; %Polarization loss
-z = 10*log10(0.3.^2./(4*pi()*geoDiff(lat,lon,alt,lat2,lon2,alt2).^2)); % Free space loss calculation
-AG_rx = 10; % Recieve Antenna gain
-Pr = PTx + AG_tx + pl + z; % Recieved power
+z = 20*log10((4*pi*R/lambda)); % Free space loss calculation
+% AG_rx = 10; % Recieve Antenna gain
+Pr = PTx + AG_tx + pl - z; % Recieved power
 Rs = -93; % Receive Antenna sensitivity for 90% message success rate in dBm
 Lm = Pr - Rs; % Link Margin
-EbNo = 10*log10(Lm);
+EbNo = 0; % eliminated from analysis
 
 end
-

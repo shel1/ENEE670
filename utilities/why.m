@@ -149,6 +149,8 @@ switch randi(6)
       a = 'hamster';
    case 6
       a = 'kid';
+    case 7
+      a = 'neurologist';
 end
 
 function a = nominative_pronoun
@@ -249,6 +251,8 @@ switch randi(3)
       a = 'please';
    case 3
       a = 'satisfy';
+    case 4
+        a = 'destroy';
 end
 
 function a = transitive_verb

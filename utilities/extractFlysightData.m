@@ -1,6 +1,11 @@
 function [ varargout ] = extractFlysightData( data, varargin )
 %EXTRACTFLYSIGHTDATA Return a single record
-%   Detailed explanation goes here
+%   [out] = extractFlysightData(inVar)
+%   This returns the jump struct in one variable
+%   [T,lat,lon,hMSL,velN,velE,velD,hAcc,vAcc,sAcc] =
+%   extractFlysightData(inVar)
+%   extractFlysightData(inVar,int) specifies the index/indicies
+%   of inVar to extract
     if nargin == 2
         idx = varargin{1};
     end
@@ -19,16 +24,6 @@ function [ varargout ] = extractFlysightData( data, varargin )
     sAcc = data(idx).jump.sAcc;
     
     if nargout == 1
-%         out.T   = T;
-%         out.lat = lat;
-%         out.lon = lon;
-%         out.hMSL = hMSL;
-%         out.velN = velN;
-%         out.velE = velE;
-%         out.velD = velD;
-%         out.hAcc = hAcc;
-%         out.vAcc = vAcc;
-%         out.sAcc = sAcc;
         varargout = {data(idx).jump};
     else
         varargout{1} = T;

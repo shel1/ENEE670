@@ -23,28 +23,46 @@ if (0)
     figure;plot(S2t3)
 end
 %%
-d1 = LoganData(1).velD(2100:2309);
-d2 = LoganData(5).velD;
-[C lags] = xcorr(d1,d2);
+% d1 = LoganData(1).jump.velD(2100:2309);
+% l1 = LoganData(1).jump.velD(2815:3000);
+load('exitSig.mat');
+ju=32;
+x1 = LoganData(ju).jump.velD;
+figure;
+plot(x1);
+
+
+[C lags] = xcorr(exVelD,x1);
 [z,I] = max(abs(C));
 tDiff = lags(I);
+[C2 lags2] = xcorr(landVelD,x1);
+[z2,I2] = max(abs(C2));
+tDiffL = lags(I2);
+[ex1,ld1,ex2,ld2] = getExit(LoganData(ju),1);
+
+figure;
     subplot(311); plot(d1); title('s1');
-    subplot(312); plot(d2); title('s2');
-    subplot(313); plot(lags,C);
-    title('Cross-correlation between s1 and s2')
-    figure;
-    plot(d2(abs(tDiff):end));
-    hold;
-    plot(d1,'r');
-    hold;
+%     subplot(312); plot(d2); title('s2');
+%     subplot(313); plot(lags,C);
+%     title('Cross-correlation between s1 and s2')
+%     figure;
+%     plot(d2(abs(tDiff):end));
+%     hold all;
+%     plot(d1,'r');
+%     figure;
+%     plot(d2(1:abs(tDiffL)+200));
+%     hold all;
+%     plot(l1,'r');
+    
+    
 %%
-d2 = LoganData(4).velD(100:end);
+d2 = LoganData(4).jump.velD(100:end);
 [C lags] = xcorr(d1,d2);
 [z,I] = max(abs(C));
 tDiff = lags(I); 
-plot(d2,'b');
-hold;
-d2 = LoganData(5).velD(100:end);
+plot(d2(abs(tDiff):end),'b');
+
+d2 = LoganData(5).jump.velD(100:end);
 [C lags] = xcorr(d1,d2);
 [z,I] = max(abs(C));
 tDiff = lags(I); 
